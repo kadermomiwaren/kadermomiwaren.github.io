@@ -5,7 +5,7 @@
 // (misalnya /uji/ dan /resmi/) tidak saling menghapus cache.
 const SCOPE = (() => { try { return new URL(self.registration.scope).pathname.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'root'; } catch (e) { return 'root'; } })();
 const OLD = 'literasi-app-' + SCOPE + '-';
-const APP = OLD + 'v0.9.3';
+const APP = OLD + 'v0.9.4';
 const AUDIO = 'literasi-audio-v1';
 // Teks aplikasi (wajib). index.html diunduh sekali lalu disimpan untuk './' dan 'index.html'.
 const CORE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];

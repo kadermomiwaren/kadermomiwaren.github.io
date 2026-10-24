@@ -1,9 +1,12 @@
-# Literasi Kesehatan Kader Momiwaren v0.9.3, dirakit 25 Oktober 2026
+# Literasi Kesehatan Kader Momiwaren v0.9.4, dirakit 25 Oktober 2026
 # Verifikasi: sha256sum -c CHECKSUMS.txt   (atau: certutil -hashfile <berkas> SHA256 di Windows)
-07a49dc7697d025a57e4449fab38af393a26a6f7114ed6f323cfe1c73651134c  index.html
-06d298ace9e097c0e10fc66bb8682e37eaf08d747009f9a2e71af1a7402b1ada  sw.js
+fd1164b30d0f1e9ee85724f2b8ce8665322464a6cb304c657e9990a77ea7461f  index.html
+33583b4fb02c0623f659fbafdc6782d54b0376869584336c38587bd6200e52cd  sw.js
 8e17964c4e89bf04d4fecb422f6fc14c009b4b67df758b666dce82061a3e7cbd  manifest.webmanifest
 9973b14acf7961da10b5f9c7aa8fef1c57bee992d56b28a77b164182c97cfe5f  audio/daftar.json
+9063446205398efb5ff24195ed3b033130a8b2e17e3f0f9028e0c51db182e8ef  sumber-foto.html
+4fa51eb6e6c064b15a9950b18f7d4403037e6641209406dc8f4822ffc67a8de8  sumber.html
+adccd68e28f7a74e1b32387aa613562cca0ae3ec672ae0ccd4c0954d9e53937b  tinjauan.html
 819a5ff0b4e69c82dfa4fb84a341695cbe9cddb96e0e1c7d7f1771c2cc211d47  icons/icon-192.png
 5e3b2c45bcd27287933576450715212d8f9f511dff1fd343bbe239c506b5a752  icons/icon-512.png
 1e13ba9d1d6280a83565512ec42086fb214ab61d348752118831d646bc4c3c6a  img/anak-arfak.webp
