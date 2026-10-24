@@ -1,0 +1,46 @@
+{
+ "headers": [
+  {
+   "source": "/sw.js",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-cache, must-revalidate"
+    },
+    {
+     "key": "Service-Worker-Allowed",
+     "value": "/"
+    }
+   ]
+  },
+  {
+   "source": "/index.html",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-cache, must-revalidate"
+    }
+   ]
+  },
+  {
+   "source": "/audio/daftar.json",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-cache, must-revalidate"
+    }
+   ]
+  },
+  {
+   "source": "/(.*)",
+   "headers": [
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    }
+   ]
+  }
+ ],
+ "cleanUrls": false,
+ "trailingSlash": false
+}
