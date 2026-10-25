@@ -287,14 +287,23 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 .toast{position:fixed;left:16px;right:16px;margin:0 auto;width:-webkit-fit-content;width:fit-content;max-width:30rem;bottom:calc(5.5rem + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:.5rem 1rem;border-radius:1rem;font-weight:700;text-align:center;z-index:9;pointer-events:none}
 .foot{font-size:.85rem;color:var(--muted)}
 /* ---------- Tampilan v0.7: foto sampul, bilah segmen, peta modul, angka hidup ---------- */
-.hero{position:relative;margin:-1.25rem -16px 0;height:clamp(240px,56vw,380px);overflow:hidden;background:#0f1a22;color:#fff;display:grid;align-content:end;border-radius:0 0 24px 24px;isolation:isolate}
-.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center;animation:kb 38s ease-in-out infinite alternate;will-change:transform}
+.hero{position:relative;margin:-1.25rem -16px 0;min-height:clamp(240px,56vw,380px);overflow:hidden;background:#0f1a22;color:#fff;display:grid;align-content:end;border-radius:0 0 24px 24px;isolation:isolate}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:center;animation:kb 38s ease-in-out infinite alternate;will-change:transform}
 @keyframes kb{from{transform:scale(1.03) translate3d(0,0,0)}to{transform:scale(1.13) translate3d(-2%,-1.5%,0)}}
 .hero .grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,14,20,.02) 0%,rgba(8,14,20,.12) 40%,rgba(8,14,20,.84) 100%)}
-.hero .txt{position:relative;padding:1rem 16px 1.15rem;display:grid;gap:.45rem;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.hero .txt{position:relative;padding:2.25rem 16px 1.15rem;display:grid;gap:.45rem;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .hero .eyebrow{color:rgba(255,255,255,.85)}
 .hero h1{color:#fff;font-size:clamp(2.4rem,9vw,3.4rem)}
 .hero .lead{color:rgba(255,255,255,.92);font-size:1.08rem;max-width:32rem}
+/* Identitas program di sampul beranda: logo yang sama dengan pembuka, di atas kaca gelap tipis, supaya logo ITS (putih)
+   tetap terbaca di foto terang. Muncul pelan setiap beranda tampil, menyambung dari pembuka. */
+.hero-logos{display:flex;align-items:center;gap:.7rem;width:-webkit-fit-content;width:fit-content;max-width:100%;padding:.35rem .75rem;margin-bottom:.3rem;border-radius:12px;
+  background:rgba(8,14,20,.34);border:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:.92;
+  animation:heroLogo .7s .15s cubic-bezier(.22,1,.36,1) both}
+.hero-logos img{display:block;height:clamp(1.6rem,6vw,2.2rem);width:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.hero-logos img:nth-child(2){height:clamp(2rem,7.5vw,2.75rem);margin:-.3rem 0}
+.hero-logos img+img{padding-left:.7rem;border-left:1px solid rgba(255,255,255,.22)}
+@keyframes heroLogo{from{opacity:0;transform:translateY(8px)}to{opacity:.92;transform:none}}
 .cred{position:absolute;right:10px;top:8px;z-index:2;font-size:.68rem;color:rgba(255,255,255,.78);background:rgba(0,0,0,.3);padding:.12rem .55rem;border-radius:999px;max-width:72%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #home > .say{margin-top:.25rem}
 
@@ -343,7 +352,7 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 .conf{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
 .conf i{position:absolute;top:-6vh;font-style:normal;font-size:1.5rem;animation:fall 2.8s ease-in forwards;color:#F2C46C;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 @keyframes fall{to{transform:translateY(112vh) rotate(480deg);opacity:.15}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.hero img{transform:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.hero>img{transform:none!important}}
 /* Cetak: setiap layar modul yang sedang dibuka menjadi satu halaman lembar balik.
    Warna dipaksa terang walau HP sedang gelap; hanya tombol yang disembunyikan, isinya tidak.
    Cerita dicetak utuh, dan naskah Bacakan dicetak sebagai catatan untuk kader di bawah tiap halaman. */
@@ -407,6 +416,14 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 .splash-skip{margin:.4rem 0 0;font-size:.75rem;color:rgba(255,255,255,.55)}
 @keyframes splashIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
+/* Kembali dari modul ke beranda: animasi sama, sedikit lebih cepat (selesai 1,3 detik). */
+.splash.ulang{animation-delay:.95s}
+.splash.ulang .splash-logo>*{animation-duration:.4s}
+.splash.ulang .splash-logo img:first-child{animation-delay:0s}
+.splash.ulang .splash-logo .splash-patriot{animation-delay:.1s}
+.splash.ulang .splash-logo img:last-child{animation-delay:.2s}
+.splash.ulang .splash-judul{animation-delay:.3s}
+.splash.ulang .splash-sub{animation-delay:.4s}
 /* Tanpa animasi: semua langsung tampak; skrip menutupnya sendiri. */
 @media (prefers-reduced-motion:reduce){.splash-logo>*,.splash-judul,.splash-sub{opacity:1}}
 .tes-back{justify-self:start}
@@ -461,7 +478,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.8',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.9',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -548,6 +565,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <div class="grad"></div>
     <span class="cred" id="hero-cred"></span>
     <div class="txt">
+      <div class="hero-logos" role="img" aria-label="Program Kementerian Transmigrasi, Tim Ekspedisi Patriot, Institut Teknologi Sepuluh Nopember">
+        <img src="img/logo-kementrans.webp" width="130" height="130" alt="">
+        <img src="img/logo-patriot.webp" width="480" height="321" alt="">
+        <img src="img/logo-its.webp" width="400" height="261" alt="">
+      </div>
       <p class="eyebrow">Untuk kader dan warga Momiwaren</p>
       <h1>Literasi Kesehatan Kader</h1>
       <p class="lead">Lima modul singkat untuk dipakai bersama di posyandu atau pertemuan kampung. Pilih cara belajar, lalu pilih modul.</p>
@@ -621,7 +643,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.8, 25 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.9, 25 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
@@ -3010,7 +3032,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     else showHome();
   }
   function showHome(){
-    navGen++;stopAll();
+    var dariModul=!!cur;navGen++;stopAll();
     if(cur){st.last=(st.pos[cur]||0)<slides.length-1?cur:null;var tsH=slides[num(st.pos[cur])]&&slides[num(st.pos[cur])].querySelector('.tes');if(tsH&&tsH._settle)tsH._settle()}
     decks.forEach(function(d){d.hidden=true});home.hidden=false;$('hint').hidden=true;
     document.documentElement.removeAttribute('data-mod');
@@ -3019,6 +3041,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     cur=null;st.cur=null;tesBack=null;persist();renderMods();renderLog();
     try{history.replaceState(null,'','#beranda')}catch(e){}window.scrollTo(0,0);
     var h1=home.querySelector('h1');if(h1){h1.setAttribute('tabindex','-1');try{h1.focus({preventScroll:true})}catch(e){}}
+    if(dariModul){try{pembuka(true)}catch(e){fault('pembuka',e)}}
   }
   function openDeck(m,i,fromHistory){
     var d=own(deckBy,m)?deckBy[m]:null;if(!d)return showHome();
@@ -4347,16 +4370,18 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   }
   }catch(e){fault('pindah',e)}
 
-  /* Pembuka logo sekali per pembukaan aplikasi (sessionStorage). Tidak muncul untuk tautan langsung (#darurat, QR modul, layar tertentu)
-     supaya pertolongan tidak tertunda; paling lama 1,85 detik; ketuk atau tombol apa pun menutupnya. */
-  function pembuka(){
+  /* Pembuka logo setiap kali aplikasi dibuka atau dimuat ulang di beranda (1,85 detik), dan setiap kembali dari modul ke beranda
+     (ulang: 1,3 detik). Tidak muncul untuk tautan langsung (#darurat, QR modul, layar tertentu) supaya pertolongan tidak tertunda;
+     ketuk atau tombol apa pun menutupnya. */
+  var spT=0;
+  function pembuka(ulang){
     var sp=$('splash');if(!sp)return;
-    if(location.hash&&location.hash!=='#beranda'&&!/^#bawa=/.test(location.hash))return;
-    var sudah=false;try{sudah=!!sessionStorage.getItem('lit-pembuka');sessionStorage.setItem('lit-pembuka','1')}catch(e){}
-    if(sudah)return;
-    var tutup=function(){if(sp.hidden)return;sp.hidden=true;document.removeEventListener('keydown',tutup,true)};
+    if(!ulang&&location.hash&&location.hash!=='#beranda'&&!/^#bawa=/.test(location.hash))return;
+    var tutup=function(){clearTimeout(spT);if(sp.hidden)return;sp.hidden=true;document.removeEventListener('keydown',tutup,true)};
+    /* Dipanggil lagi saat masih tampil: tutup dulu dan paksa tata letak, supaya animasinya mulai dari awal. */
+    tutup();void sp.offsetWidth;sp.classList.toggle('ulang',!!ulang);
     sp.hidden=false;sp.onclick=tutup;document.addEventListener('keydown',tutup,true);
-    setTimeout(tutup,RM?1200:1850);
+    spT=setTimeout(tutup,RM?(ulang?900:1200):(ulang?1300:1850));
   }
 
   /* ---------- mulai ---------- */
@@ -4389,7 +4414,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.8'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.9'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
