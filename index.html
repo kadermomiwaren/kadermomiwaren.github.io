@@ -352,7 +352,7 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
   :root,:root[data-theme],:root:not([data-theme="light"]){
     --bg:#fff;--surface:#fff;--ink:#000;--muted:#333;--line:#999;--accent:#000;--accent-ink:#fff;
     --pulse-soft:#f2f2f2;--go-soft:#f2f2f2;--warn-soft:#f2f2f2;color-scheme:light}
-  .top,.nav,.hint,.toast,.say,.btn,.chip,.done-badge,#home,.story-stage,.fb:empty,.hero,.segs,.sheet,.conf,.metro-quick,.tes-cta,.upd{display:none!important}
+  .splash,.top,.nav,.hint,.toast,.say,.btn,.chip,.done-badge,#home,.story-stage,.fb:empty,.hero,.segs,.sheet,.conf,.metro-quick,.tes-cta,.upd{display:none!important}
   .cover{height:5cm;margin:0;border-radius:0}.cover .n{display:none}
   /* Lembar balik tetap bersih walau kuis sudah dimainkan di layar: tanpa tanda jawaban. */
   .opt.right,.opt.wrong,.opt.sel{background:#fff!important;border-color:#999!important;box-shadow:none!important}
@@ -393,6 +393,22 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 @media (hover:hover){.tes-row:hover{border-color:var(--line)}}
 .tes-row:active:not([disabled]){transform:none;box-shadow:0 2px 0 var(--line)}
 .tes-row .t{flex:1 1 0}
+/* Pembuka: logo program, paling lama 1,8 detik, ketuk untuk melewati. Tersembunyi (hidden) bila JavaScript mati atau gagal. */
+.splash{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;text-align:center;cursor:pointer;color:#fff;
+  background:radial-gradient(circle at 50% 38%,#1F3E57 0%,#0D141B 72%);animation:splashOut .35s ease-in 1.45s forwards}
+.splash-in{display:grid;gap:1rem;justify-items:center;max-width:42rem}
+.splash-logo{display:flex;align-items:center;justify-content:center;gap:clamp(1rem,4vw,2.5rem);flex-wrap:wrap}
+.splash-logo>*{opacity:0;animation:splashIn .5s cubic-bezier(.22,1,.36,1) forwards}
+.splash-logo img:first-child{width:clamp(4rem,16vw,6.5rem);height:auto;animation-delay:.05s}
+.splash-logo .splash-patriot{width:clamp(7rem,32vw,12rem);height:auto;animation-delay:.2s;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45))}
+.splash-logo img:last-child{width:clamp(5.5rem,22vw,9rem);height:auto;animation-delay:.35s}
+.splash-judul{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,6vw,2.4rem);line-height:1.1;opacity:0;animation:splashIn .5s .5s forwards}
+.splash-sub{margin:0;font-size:.9rem;line-height:1.45;color:rgba(255,255,255,.82);opacity:0;animation:splashIn .5s .65s forwards}
+.splash-skip{margin:.4rem 0 0;font-size:.75rem;color:rgba(255,255,255,.55)}
+@keyframes splashIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+/* Tanpa animasi: semua langsung tampak; skrip menutupnya sendiri. */
+@media (prefers-reduced-motion:reduce){.splash-logo>*,.splash-judul,.splash-sub{opacity:1}}
 .tes-back{justify-self:start}
 /* Foto klinis: dua kolom bila muat; foto utuh (tidak dipotong), keterangan dan sumber di bawahnya. */
 .klinis{display:grid;grid-template-columns:1fr;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:.75rem;align-items:start}
@@ -445,7 +461,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.6',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.7',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -471,6 +487,18 @@ setTimeout(function(){end(false)},8000);
 fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 .then(function(r){return r.ok?r.text():''}).then(function(t){end(String(t).indexOf('Literasi Kesehatan Kader Momiwaren')>=0)},function(){end(false)})}}catch(e){keep()}}
 })();</script><noscript><style>#boot-fail[hidden]{display:block!important}</style></noscript>
+<div class="splash" id="splash" hidden aria-hidden="true">
+  <div class="splash-in">
+    <div class="splash-logo">
+      <img src="img/logo-kementrans.webp" width="130" height="130" alt="">
+      <img class="splash-patriot" src="img/logo-patriot.webp" width="480" height="321" alt="">
+      <img src="img/logo-its.webp" width="400" height="261" alt="">
+    </div>
+    <p class="splash-judul">Literasi Kesehatan Kader</p>
+    <p class="splash-sub">Tim Ekspedisi Patriot · Institut Teknologi Sepuluh Nopember<br>Program Kementerian Transmigrasi</p>
+    <p class="splash-skip">Ketuk untuk lanjut</p>
+  </div>
+</div>
 </head><body><header class="top">
   <div class="top-in">
     <button class="menu" id="home-btn" hidden>Menu</button>
@@ -593,7 +621,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.6, 25 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.7, 25 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
@@ -2669,7 +2697,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
   <p class="muted">Ketuk nomor untuk menelepon langsung.</p>
   <p class="box tip">Tidak ada sinyal? Kirim satu orang ke Puskesmas atau rumah bidan, dan satu orang menyiapkan kendaraan kampung yang sudah disepakati.</p>
-  <p class="foot">Sumber: <a href="https://www.who.int/docs/default-source/mca-documents/imci-chart-booklet.pdf">WHO IMCI chart booklet</a> (napas cepat, tanda bahaya umum, diare); <a href="https://kesprimkom.kemkes.go.id/assets/uploads/contents/others/Buku_KIA_2024.pdf">Buku KIA Kemenkes 2024</a> (tanda bahaya ibu dan bayi); <a href="https://www.who.int/publications/i/item/WHO-FCH-CAH-06.1">WHO Oral Rehydration Salts</a>; <a href="https://www.who.int/health-topics/snakebite">WHO snakebite</a>. Batas napas lambat 30/25/20 adalah usulan tim, belum berdasar pedoman. Rincian per klaim: <a href="sumber.html">Sumber per klaim</a>. Status telaah klinis: belum ditinjau dokter Puskesmas (<a href="tinjauan.html">Tinjauan klinis</a>).</p>
+  <p class="foot">Sumber: <a href="https://www.who.int/docs/default-source/mca-documents/imci-chart-booklet.pdf">WHO IMCI chart booklet</a> (napas cepat, tanda bahaya umum, diare); <a href="https://kesprimkom.kemkes.go.id/assets/uploads/contents/others/Buku_KIA_2024.pdf">Buku KIA Kemenkes 2024</a> (tanda bahaya ibu dan bayi); <a href="https://www.who.int/publications/i/item/WHO-FCH-CAH-06.1">WHO Oral Rehydration Salts</a>; <a href="https://www.who.int/health-topics/snakebite">WHO snakebite</a>. Alat hitung napas hanya memakai batas napas cepat IMCI/MTBS; tanda bahaya diperiksa tersendiri. Rincian per klaim: <a href="sumber.html">Sumber per klaim</a>. Status telaah klinis: belum ditinjau dokter Puskesmas (<a href="tinjauan.html">Tinjauan klinis</a>).</p>
 </section>
 
 </div>
@@ -3952,9 +3980,9 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     wakeOff()}}
   var ntLast=0;
   function ntClear(){if($('nt-fb')){$('nt-fb').textContent='';$('nt-fb').className='fb'}}
-  /* Batas bawah per umur (lim 60/50/40 = <2 bln / 2–11 bln / 1–5 th). Di bawah ini napas lebih lambat
-     dari biasanya untuk umur itu: hitung ulang, dan antar bila anak lemas. Perlu ditinjau dokter. */
-  var NT_LOW={60:30,50:25,40:20};
+  /* Klasifikasi otomatis hanya memakai batas napas cepat IMCI/MTBS (lim 60/50/40 = <2 bln / 2–11 bln / 1–5 th).
+     Tidak ada ambang napas lambat (keputusan Ketua, 25 Okt 2026, butir 1): tanda bahaya diperiksa tersendiri,
+     di pintu periksa sebelum menghitung dan diulang di setiap hasil. */
   try{ /* batas galat: nt-start */
   if($('nt-start')){
     /* Saringan tanda bahaya umum dulu: anak dengan tanda ini diantar tanpa menunggu hitung napas. */
@@ -3999,15 +4027,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     $('nt-pad').addEventListener('click',function(){if(ntPD){ntPD=false;return}ntTap()});
     $('nt-pad').addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();ntTap()}});
     $('nt-check').onclick=function(){
-      var raw=String($('nt-count').value||'').trim(),lim=+$('nt-age').value,low=NT_LOW[lim]||20,fb=$('nt-fb');
+      var raw=String($('nt-count').value||'').trim(),lim=+$('nt-age').value,fb=$('nt-fb');
       if(!lim){fb.textContent='Pilih umur anak dulu.';fb.className='fb no';$('nt-age').focus();return}
       if(raw===''){fb.textContent='Isi dulu jumlah napas yang dihitung.';fb.className='fb no';return}
       /* Hanya bilangan bulat yang diterima; "1e2", "39.9", atau "-1" diminta diperbaiki, bukan ditafsirkan. */
       if(!/^\d{1,3}$/.test(raw)){fb.textContent='Tulis angka bulat saja, misalnya 38. Yang terisi: "'+raw.slice(0,12)+'".';fb.className='fb no';return}
       var n=parseInt(raw,10);
       if(n>150){fb.textContent='Angka '+n+' terlalu besar untuk 60 detik. Periksa lagi angka yang diketik. Napasnya memang sangat cepat? Antar sekarang.';fb.className='fb no';return}
-      if(n<10){fb.textContent='Napas sangat lambat atau berhenti: ini gawat. Panggil bantuan dan antar sekarang. Anak tidak sadar dan tidak bernapas normal? Mulai napas buatan dan tekan dada sesuai umur anak (Modul 1, layar Anak dan bayi).';fb.className='fb no';return}
-      if(n<low){fb.textContent=n+' napas per menit: lebih lambat dari biasanya untuk umur ini. Hitung ulang saat anak tenang. Anak sangat lemas, sulit dibangunkan, atau napasnya berhenti-henti? Berangkat ke Puskesmas sekarang.'+(lim===60?' Bayi di bawah 2 bulan yang demam, badan dingin, merintih, atau tidak mau menyusu: berangkat sekarang.':'');fb.className='fb no';return}
+      /* Angka di bawah 10 bukan klasifikasi: hampir pasti salah hitung atau napas berhenti-henti. Minta hitung ulang dan periksa tanda bahaya. */
+      if(n<10){fb.textContent='Angka '+n+' terlalu kecil untuk hitungan 60 detik. Hitung ulang 60 detik penuh sambil melihat dada naik. Napas berhenti-henti, anak sangat lemas, atau sulit dibangunkan: berangkat sekarang. Anak tidak sadar dan tidak bernapas normal? Mulai napas buatan dan tekan dada sesuai umur anak (Modul 1, layar Anak dan bayi).';fb.className='fb no';return}
       /* Bayi di bawah 2 bulan (IMCI bayi muda): hitung ulang sekali; tetap 60 atau lebih berarti sangat berisiko, antar sekarang. */
       if(n>=lim&&lim===60){fb.textContent=n+' napas per menit: cepat untuk bayi di bawah 2 bulan. Hitung sekali lagi 60 detik. Tetap 60 atau lebih? Bayi muda cepat memburuk: antar ke Puskesmas sekarang.';fb.className='fb no'}
       else if(n>=lim){fb.textContent=n+' napas per menit: napas cepat untuk umur ini (batas '+lim+'). Antar ke Puskesmas hari ini.';fb.className='fb no'}
@@ -4306,8 +4334,21 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   }
   }catch(e){fault('pindah',e)}
 
+  /* Pembuka logo sekali per pembukaan aplikasi (sessionStorage). Tidak muncul untuk tautan langsung (#darurat, QR modul, layar tertentu)
+     supaya pertolongan tidak tertunda; paling lama 1,85 detik; ketuk atau tombol apa pun menutupnya. */
+  function pembuka(){
+    var sp=$('splash');if(!sp)return;
+    if(location.hash&&location.hash!=='#beranda'&&!/^#bawa=/.test(location.hash))return;
+    var sudah=false;try{sudah=!!sessionStorage.getItem('lit-pembuka');sessionStorage.setItem('lit-pembuka','1')}catch(e){}
+    if(sudah)return;
+    var tutup=function(){if(sp.hidden)return;sp.hidden=true;document.removeEventListener('keydown',tutup,true)};
+    sp.hidden=false;sp.onclick=tutup;document.addEventListener('keydown',tutup,true);
+    setTimeout(tutup,RM?1200:1850);
+  }
+
   /* ---------- mulai ---------- */
   function start(data){
+    try{pembuka()}catch(e){fault('pembuka',e)}
     /* Data dibawa dari alamat lama (#bawa=...): diterima sebelum simpanan dibaca. */
     try{terimaBawaan()}catch(e){fault('bawa',e)}
     st=Object.assign(st,load(),data&&data.done?data:{});
@@ -4335,7 +4376,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.6'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.7'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
