@@ -5,10 +5,10 @@
 // (misalnya /uji/ dan /resmi/) tidak saling menghapus cache.
 const SCOPE = (() => { try { return new URL(self.registration.scope).pathname.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'root'; } catch (e) { return 'root'; } })();
 const OLD = 'literasi-app-' + SCOPE + '-';
-const APP = OLD + 'v0.9.4';
+const APP = OLD + 'v0.9.5';
 const AUDIO = 'literasi-audio-v1';
-// Teks aplikasi (wajib). index.html diunduh sekali lalu disimpan untuk './' dan 'index.html'.
-const CORE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+// Teks aplikasi (wajib), termasuk tiga halaman dokumen supaya bisa dibuka tanpa sinyal. index.html diunduh sekali lalu disimpan untuk './' dan 'index.html'.
+const CORE = ['manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'sumber.html', 'tinjauan.html', 'sumber-foto.html'];
 // Foto sampul: tidak wajib. Yang gagal atau macet tidak menahan pemasangan; halaman menghitung ulang dan melengkapinya.
 const IMG = ['img/arfak-teluk.webp','img/senja-rouwor.webp','img/dermaga-sumano.webp','img/mama-puskesmas.webp','img/bermain-saga.webp','img/kader-benawa.webp','img/anak-arfak.webp','img/perahu-sumano.webp','img/posyandu-benawa.webp','img/noken.webp'];
 const IMG_WAIT = 15000, IMG_PHASE = 15000;
