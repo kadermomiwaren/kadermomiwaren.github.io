@@ -283,7 +283,10 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 .badge{font-family:var(--display);font-size:1.3rem}
 
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.nav-in{max-width:46rem;margin:0 auto;padding:.6rem 16px;display:grid;grid-template-columns:auto 1fr auto;gap:.75rem;align-items:center}
+.nav-in{max-width:46rem;margin:0 auto;padding:.6rem 16px;display:grid;grid-template-columns:auto auto 1fr auto;grid-template-areas:"sos prev prog next";gap:.75rem;align-items:center}
+/* Darurat juga di bilah bawah: terjangkau jempol saat HP dipegang satu tangan. Ditaruh di kiri, jauh dari Lanjut, supaya tidak salah ketuk. */
+#sos-btn2{grid-area:sos;border-color:var(--sos);color:var(--sos);padding-left:.8rem;padding-right:.8rem}
+#prev{grid-area:prev}#prog{grid-area:prog}#next{grid-area:next}
 .prog{display:grid;gap:.25rem;text-align:center;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:0;border:0;background:transparent;padding:.25rem .4rem;border-radius:10px;min-height:44px;align-content:center}
 .prog:active{background:var(--bg)}
 .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
@@ -387,8 +390,9 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
   .menu{padding:.3rem .6rem;font-size:.85rem;min-height:42px}
   .brand small{display:none}
   :root[data-mod] .scores{display:none}
-  .nav-in{grid-template-columns:1fr 1fr;gap:.5rem .6rem;padding:.45rem 12px}
-  .nav-in .prog{grid-column:1/-1;order:-1;min-height:36px;padding:.1rem .3rem}
+  .nav-in{grid-template-columns:6rem 1fr 6rem 1fr;grid-template-areas:"sos prog prog prog" "prev prev next next";gap:.5rem .6rem;padding:.45rem 12px}
+  .nav-in .prog{min-height:36px;padding:.1rem .3rem}
+  #sos-btn2{min-height:36px;padding:.1rem .4rem;font-size:.9rem}
   .toast{bottom:calc(8rem + env(safe-area-inset-bottom,0px))}
 }
 /* HP diputar mendatar (layar pendek): kepala ikut tergulir dan bilah bawah lebih tipis, supaya ruang isi tidak tinggal separuh layar. */
@@ -484,7 +488,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.11',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.12',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -646,7 +650,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.11, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.12, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
@@ -2738,6 +2742,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
 <nav class="nav" id="nav" aria-label="Navigasi modul" hidden>
   <div class="nav-in">
+    <button class="btn ghost sos-bawah" id="sos-btn2" type="button" aria-label="Bantuan darurat: nomor penting dan ketukan RJP">Darurat</button>
     <button class="btn ghost" id="prev">Kembali</button>
     <button class="prog" id="prog" aria-label="Buka peta modul"><span id="prog-t"></span><div class="bar"><i id="prog-b"></i></div></button>
     <button class="btn" id="next">Lanjut</button>
@@ -2907,7 +2912,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
   /* ---------- catatan sesi tanpa nama (indikator proses untuk Puskesmas) ---------- */
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.11'}}
+  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.12'}}
   function used(s){return s&&(Object.keys(s.mods).length||s.say||s.act)}
   /* Satu pintu untuk mengganti sesi (ganti hari, ganti kampung, atau "Mulai sesi baru"):
      sesi lama diarsipkan bila ada kegiatannya, lalu bintang dan tanda "sudah dihitung" dimulai dari nol,
@@ -3364,7 +3369,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     stopAll();closeMap();openSheet('sos');
   }
   try{ /* batas galat: sos-btn */
-  $('sos-btn').onclick=openSos;$('sos-bd').onclick=closeMap;$('sos-close').onclick=closeMap;
+  $('sos-btn').onclick=openSos;$('sos-btn2').onclick=openSos;$('sos-bd').onclick=closeMap;$('sos-close').onclick=closeMap;
   }catch(e){fault('sos-btn',e)}
   /* Pintu darurat dibedakan umur, karena teknik dewasa berbeda dengan anak/bayi. Metronom tidak dinyalakan otomatis:
      kader mulai menekan dulu; kedua layar tujuan punya tombol "Nyalakan ketukan" bila bunyi pemandu membantu. */
@@ -4437,7 +4442,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.11'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.12'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
