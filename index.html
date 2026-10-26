@@ -328,6 +328,16 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 .segs button.cur::before{background:var(--pulse);opacity:1;top:10px;height:6px}
 
 .sheet{position:fixed;inset:0;z-index:20;display:grid;align-items:end}
+/* Tunjukkan ke warga: gambar layar penuh; Putar membalik 180° supaya tegak bagi warga yang duduk berhadapan dengan kader. */
+.tunjuk{position:fixed;inset:0;z-index:30;background:var(--surface)}
+.tunjuk-pn{display:grid;grid-template-rows:1fr auto;height:100%;max-width:60rem;margin:0 auto;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.tunjuk-isi{display:grid;place-items:center;overflow:auto;min-height:0;transition:transform .3s}
+.tunjuk-isi.putar{transform:rotate(180deg)}
+.tunjuk-isi figure{margin:0;width:100%;text-align:center}
+.tunjuk-isi svg,.tunjuk-isi img{display:block;width:100%;height:auto;max-height:calc(100dvh - 7rem);object-fit:contain;margin:0 auto}
+.tunjuk-isi figcaption{display:none}
+.tunjuk-bar{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;padding-top:.6rem}
+.tunjuk-go{margin-top:.5rem;min-height:40px;padding:.3rem .9rem;font-size:.9rem}
 .sheet .bd{position:absolute;inset:0;background:rgba(5,10,15,.5)}
 .sheet .pn{position:relative;background:var(--surface);border-radius:22px 22px 0 0;max-height:80vh;overflow:auto;padding:.6rem 16px calc(1rem + env(safe-area-inset-bottom,0px));max-width:46rem;margin:0 auto;width:100%;box-shadow:0 -10px 36px rgba(0,0,0,.3);animation:up .26s cubic-bezier(.22,1,.36,1)}
 @keyframes up{from{transform:translateY(36px);opacity:0}}
@@ -368,7 +378,7 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
   :root,:root[data-theme],:root:not([data-theme="light"]){
     --bg:#fff;--surface:#fff;--ink:#000;--muted:#333;--line:#999;--accent:#000;--accent-ink:#fff;
     --pulse-soft:#f2f2f2;--go-soft:#f2f2f2;--warn-soft:#f2f2f2;color-scheme:light}
-  .splash,.top,.nav,.hint,.toast,.say,.btn,.chip,.done-badge,#home,.story-stage,.fb:empty,.hero,.segs,.sheet,.conf,.metro-quick,.tes-cta,.upd{display:none!important}
+  .splash,.top,.nav,.hint,.toast,.say,.btn,.chip,.done-badge,#home,.story-stage,.fb:empty,.hero,.segs,.sheet,.conf,.metro-quick,.tes-cta,.upd,.tunjuk,.tunjuk-go{display:none!important}
   .cover{height:5cm;margin:0;border-radius:0}.cover .n{display:none}
   /* Lembar balik tetap bersih walau kuis sudah dimainkan di layar: tanpa tanda jawaban. */
   .opt.right,.opt.wrong,.opt.sel{background:#fff!important;border-color:#999!important;box-shadow:none!important}
@@ -488,7 +498,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.12',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.13',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -553,7 +563,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       </div>
       <p class="muted" id="vo-note" hidden></p>
       <label class="switch"><input type="checkbox" id="opt-auto"> Bacakan otomatis setiap pindah layar</label>
-      <label class="switch"><input type="checkbox" id="opt-sfx" checked> Bunyi saat jawaban benar</label>
+      <label class="switch"><input type="checkbox" id="opt-sfx" checked> Bunyi dan getar saat jawaban benar</label>
       <div class="row" id="print-row" hidden><button class="btn ghost" id="print-btn">Cetak modul ini sebagai lembar balik</button></div>
       <div class="row"><a class="btn ghost" href="?reset=1" id="repair-link">Perbaiki aplikasi</a><span class="muted">Menghapus salinan aplikasi yang tersimpan di HP, lalu mengunduhnya lagi. Catatan sesi dan rekaman suara tidak dihapus. Butuh sinyal; tanpa sinyal tidak ada yang dihapus.</span></div>
     </div>
@@ -627,8 +637,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="muted">Catatan ini tidak memuat nama dan tidak memuat jawaban per orang. Yang dicatat hanya tanggal, tempat, modul yang dibuka dan modul yang semua layarnya sudah dibuka, berapa kali Bacakan dipakai, apakah dipakai tanpa sinyal, dan jumlah jawaban benar pada tes awal dan tes akhir. Catatan hanya ada di HP ini sampai kamu menyalinnya. Jawaban tes belajar sendiri juga tersimpan di HP ini supaya pembahasannya bisa dibuka lagi; ikut terhapus dengan tombol hapus di bawah.</p>
     <div class="log-list" id="log-list"></div>
     <div class="row"><button class="btn" id="log-wa">Kirim ringkasan (WhatsApp dll.)</button><button class="btn ghost" id="log-copy">Salin ringkasan</button></div>
-    <div class="row"><button class="btn ghost" id="log-cadang" type="button">Salin tautan cadangan catatan</button></div>
-    <p class="muted">Untuk pindah HP atau berjaga-jaga: simpan tautan ini, misalnya kirim ke diri sendiri. Membukanya di HP lain memulihkan catatan sesi, nomor jaga, dan pengaturan; catatan yang sudah ada di HP itu tidak dihapus.</p>
+    <div class="row"><button class="btn ghost" id="log-cadang" type="button">Bagikan tautan cadangan catatan</button></div>
+    <p class="muted">Untuk pindah HP atau berjaga-jaga. Di Android, tautan bisa dikirim tanpa sinyal lewat Quick Share atau Bluetooth; bisa juga lewat WhatsApp, atau disalin. Membukanya di HP lain (yang sudah pernah membuka aplikasi ini) memulihkan catatan sesi, nomor jaga, dan pengaturan; catatan yang sudah ada di HP itu tidak dihapus.</p>
     <p class="muted">Yang dikirim persis seperti daftar di atas. HP dipakai bersama atau akan diserahkan ke orang lain? Hapus catatannya dulu.</p>
     <div class="row"><button class="btn ghost" id="log-clear">Hapus semua catatan di HP ini</button></div>
   </details>
@@ -650,7 +660,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.12, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.13, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
@@ -785,7 +795,9 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <div class="row">
       <button class="btn ghost" id="msg-copy">Salin pesan</button>
       <button class="btn ghost" id="msg-say">Bacakan pesan</button>
+      <button class="btn ghost" id="msg-gps" type="button">Tambahkan lokasi saya (GPS)</button>
     </div>
+    <p class="muted" id="msg-gps-st" aria-live="polite">Lokasi hanya diambil saat tombol GPS diketuk, hanya untuk pesan ini, dan tidak disimpan. GPS bisa bekerja tanpa sinyal internet; coba di tempat terbuka.</p>
   </div>
 </section>
 
@@ -2764,6 +2776,12 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     </div>
   </div>
 </div>
+<div class="tunjuk" id="tunjuk" hidden>
+  <div class="tunjuk-pn" role="dialog" aria-modal="true" aria-label="Gambar untuk ditunjukkan ke warga">
+    <div class="tunjuk-isi" id="tunjuk-isi"></div>
+    <div class="tunjuk-bar"><button class="btn ghost" id="tunjuk-putar" type="button">Putar untuk warga di seberang</button><button class="btn" id="tunjuk-tutup" type="button">Tutup</button></div>
+  </div>
+</div>
 <div class="sheet" id="map" hidden>
   <div class="bd" id="map-bd"></div>
   <div class="pn" role="dialog" aria-modal="true" aria-label="Peta modul">
@@ -2912,7 +2930,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
   /* ---------- catatan sesi tanpa nama (indikator proses untuk Puskesmas) ---------- */
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.12'}}
+  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.13'}}
   function used(s){return s&&(Object.keys(s.mods).length||s.say||s.act)}
   /* Satu pintu untuk mengganti sesi (ganti hari, ganti kampung, atau "Mulai sesi baru"):
      sesi lama diarsipkan bila ada kegiatannya, lalu bintang dan tanda "sudah dihitung" dimulai dari nol,
@@ -2977,7 +2995,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   try{ /* batas galat: log-cadang */
   $('log-cadang').onclick=function(){
     var t=location.origin+location.pathname+'#bawa='+bawaan();
-    try{navigator.clipboard.writeText(t).then(function(){toast('Tautan cadangan disalin. Simpan di tempat aman.')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}
+    var salin=function(){try{navigator.clipboard.writeText(t).then(function(){toast('Tautan cadangan disalin. Simpan di tempat aman.')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
+    /* Menu berbagi HP: di Android termasuk Quick Share/Bluetooth yang bekerja tanpa sinyal. */
+    if(navigator.share)navigator.share({title:'Cadangan catatan kader',text:'Buka tautan ini di HP tujuan untuk memulihkan catatan kader Momiwaren.',url:t}).catch(function(e){if(!e||e.name!=='AbortError')salin()});
+    else salin();
   };
   }catch(e){fault('log-cadang',e)}
   try{ /* batas galat: log-copy */
@@ -3333,7 +3354,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   /* Lembar dari bawah sebagai dialog modal: fokus masuk ke dalamnya, Tab berputar di dalam, isi di belakangnya
      tidak bisa disentuh (inert), dan fokus kembali ke tombol pembuka saat ditutup. */
   var sheetOpener=null;
-  function sheetOpen(){return !$('map').hidden||!$('sos').hidden}
+  function sheetOpen(){return !$('map').hidden||!$('sos').hidden||!$('tunjuk').hidden}
   function focusables(root){return all('button:not([disabled]),a[href],input,select,[tabindex]:not([tabindex="-1"])',root).filter(function(e){return !e.hidden&&e.offsetParent!==null})}
   function openSheet(id){
     sheetOpener=document.activeElement;
@@ -3348,14 +3369,32 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     var top=document.querySelector('.top');if(top){top.removeAttribute('inert');top.removeAttribute('aria-hidden')}
     try{if(sheetOpener&&sheetOpener.focus)sheetOpener.focus()}catch(e){}sheetOpener=null;
   }
+  /* Tunjukkan ke warga (usul DeepThink): ilustrasi dan foto klinis bisa dibuka layar penuh, lalu diputar 180° untuk warga di seberang. */
+  var tunjukOpener=null;
+  function lepasLatar(on){['app','nav'].forEach(function(x){var el=$(x);if(el){if(on){el.setAttribute('inert','');el.setAttribute('aria-hidden','true')}else{el.removeAttribute('inert');el.removeAttribute('aria-hidden')}}});
+    var top=document.querySelector('.top');if(top){if(on){top.setAttribute('inert','');top.setAttribute('aria-hidden','true')}else{top.removeAttribute('inert');top.removeAttribute('aria-hidden')}}}
+  function tunjuk(fig){
+    var isi=$('tunjuk-isi'),c=fig.cloneNode(true);stopAll();
+    all('.tunjuk-go',c).forEach(function(b){b.remove()});all('figcaption[id]',c).forEach(function(x){x.removeAttribute('id')});all('[aria-describedby]',c).forEach(function(x){x.removeAttribute('aria-describedby')});
+    isi.innerHTML='';isi.classList.remove('putar');isi.appendChild(c);
+    tunjukOpener=document.activeElement;lepasLatar(true);$('tunjuk').hidden=false;setTimeout(function(){try{$('tunjuk-tutup').focus()}catch(e){}},30);
+  }
+  function tunjukTutup(){
+    var t=$('tunjuk');if(!t||t.hidden)return;t.hidden=true;$('tunjuk-isi').innerHTML='';lepasLatar(false);
+    try{if(tunjukOpener&&tunjukOpener.focus)tunjukOpener.focus()}catch(e){}tunjukOpener=null;
+  }
+  try{ /* batas galat: tunjuk */
+  all('figure.ill, .klinis figure.photo').forEach(function(f){var b=document.createElement('button');b.type='button';b.className='btn ghost tunjuk-go';b.textContent='Tunjukkan ke warga';b.onclick=function(){tunjuk(f)};f.appendChild(b)});
+  $('tunjuk-putar').onclick=function(){$('tunjuk-isi').classList.toggle('putar')};$('tunjuk-tutup').onclick=tunjukTutup;
+  }catch(e){fault('tunjuk',e)}
   try{ /* batas galat: prog */
   $('prog').onclick=openMap;$('map-bd').onclick=closeMap;$('map-close').onclick=closeMap;
   }catch(e){fault('prog',e)}
   try{ /* batas galat: keydown */
   document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){closeMap();return}
+    if(e.key==='Escape'){if(!$('tunjuk').hidden)tunjukTutup();else closeMap();return}
     if(e.key!=='Tab'||!sheetOpen())return;
-    var pn=document.querySelector('.sheet:not([hidden]) .pn'),f=focusables(pn);if(!f.length)return;
+    var pn=document.querySelector('.sheet:not([hidden]) .pn, .tunjuk:not([hidden]) .tunjuk-pn'),f=focusables(pn);if(!f.length)return;
     var first=f[0],last=f[f.length-1];
     if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
@@ -3911,15 +3950,27 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   }catch(e){fault('.nomor-jaga',e)}
 
   /* ---------- pesan darurat ---------- */
+  /* Titik GPS untuk pesan petugas: hanya diambil saat tombol diketuk, hanya di memori (tidak disimpan, tidak ikut cadangan). */
+  var msgGps=null;
   function buildMsg(){
     if(!$('msg-out'))return;
     var who=$('msg-who').value,where=$('msg-where').value.trim()||'[sebutkan tempat dan patokan]';
     /* Pesan dikirim sebelum napas diperiksa, jadi tidak boleh mendahului: cukup "tidak sadar" dan "sedang menolong". */
-    $('msg-out').textContent='Ada '+who+' tidak sadar di '+where+'. Kami sedang menolong. Tolong kirim bantuan dan kendaraan.';
+    $('msg-out').textContent='Ada '+who+' tidak sadar di '+where+'. Kami sedang menolong. Tolong kirim bantuan dan kendaraan.'+(msgGps?' Titik GPS: '+msgGps.lat+', '+msgGps.lon+(msgGps.acc?' (ketepatan sekitar '+msgGps.acc+' m)':'')+': https://maps.google.com/?q='+msgGps.lat+','+msgGps.lon:'');
   }
   try{ /* batas galat: msg-out */
   if($('msg-out')){
     $('msg-who').onchange=buildMsg;$('msg-where').oninput=buildMsg;
+    if(!navigator.geolocation){$('msg-gps').hidden=true;$('msg-gps-st').hidden=true}
+    else $('msg-gps').onclick=function(){
+      var b=this,s=$('msg-gps-st');b.disabled=true;s.textContent='Mencari lokasi… tunggu sebentar, sebaiknya di tempat terbuka.';
+      navigator.geolocation.getCurrentPosition(function(p){
+        b.disabled=false;msgGps={lat:p.coords.latitude.toFixed(5),lon:p.coords.longitude.toFixed(5),acc:Math.round(p.coords.accuracy||0)};buildMsg();
+        s.textContent='Lokasi ditambahkan ke pesan'+(msgGps.acc?' (ketepatan sekitar '+msgGps.acc+' m)':'')+'. Tidak disimpan di HP.';
+      },function(e){
+        b.disabled=false;s.textContent=e&&e.code===1?'Izin lokasi ditolak. Tulis patokan tempat saja.':'Lokasi belum didapat. Coba di tempat terbuka, atau tulis patokan tempat saja.';
+      },{enableHighAccuracy:true,timeout:20000,maximumAge:60000});
+    };
     $('msg-say').onclick=function(){if(this.classList.contains('playing'))stopSpeak();else speak($('msg-out').textContent,this)};
     $('msg-copy').onclick=function(){
       var t=$('msg-out').textContent;
@@ -3940,8 +3991,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   /* Bunyi umpan balik hanya saat benar: dua nada naik. Jawaban yang belum tepat tidak berbunyi. */
   function buzz(ms){if(st.sfx===false)return;try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
   function sfx(){
-    if(st.sfx===false||!audio())return;
-    beep(784,.08,.22);setTimeout(function(){beep(1175,.12,.22)},85);buzz(25);
+    if(st.sfx===false)return;
+    /* Getar ringan ganda saat jawaban benar (juga bila suara HP tidak tersedia); tidak ada getar untuk jawaban salah. */
+    buzz([20,40,20]);if(!audio())return;
+    beep(784,.08,.22);setTimeout(function(){beep(1175,.12,.22)},85);
   }
   /* Kunci layar menyala selama metronom atau hitung napas berjalan: kader menatap pasien, bukan layar,
      dan layar yang mati akan menghentikan keduanya. Satu kunci dipakai bersama, dilepas bila keduanya berhenti. */
@@ -4432,6 +4485,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   }
   try{ /* batas galat: hashchange */
   window.addEventListener('hashchange',function(){
+    try{tunjukTutup()}catch(e){}
     var r=parseHash(location.hash);
     if(r)openDeck(r.m,r.i,true);else if(location.hash==='#darurat')openSos();else if((!location.hash||location.hash==='#beranda')&&cur)showHome();
   });
@@ -4442,7 +4496,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.12'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.13'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
