@@ -484,7 +484,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.10',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.11',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -646,7 +646,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.10, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.11, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
@@ -1376,7 +1376,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="muted">Setiap hasil periksa dicatat di Buku KIA. Bawa Buku KIA setiap kali periksa.</p>
 </section>
 
-<section class="slide" data-key="kespro-03" hidden data-say="Tablet tambah darah. Minum setiap hari selama hamil, minimal sembilan puluh tablet. Mual? Minum malam sebelum tidur, dengan air putih atau air jeruk, jangan dengan teh atau kopi.">
+<section class="slide" data-key="kespro-03" hidden data-say="Tablet tambah darah. Minum setiap hari selama hamil, minimal sembilan puluh tablet. Mual? Minum setelah makan malam, menjelang tidur, jangan saat perut kosong. Minum dengan air putih atau air jeruk, jangan dengan teh atau kopi.">
   <p class="eyebrow">Hamil</p>
   <h2>Tablet tambah darah setiap hari</h2>
   <div class="stats"><div class="stat"><b data-count="90">90</b><span>tablet, minimal</span></div><div class="stat"><b>1</b><span>tablet setiap hari</span></div></div>
@@ -1386,7 +1386,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <ol class="list">
       <li>Minum malam hari sebelum tidur.</li>
       <li>Minum dengan air putih atau air jeruk, jangan dengan teh atau kopi.</li>
-      <li>Makan dengan porsi lebih banyak, disertai lauk ikan, telur, atau kacang.</li>
+      <li>Minum tablet setelah makan, jangan saat perut kosong.</li>
       <li>Kalau tetap tidak tahan dan ingin berhenti, bicarakan dulu dengan bidan.</li>
     </ol>
   </div>
@@ -2782,7 +2782,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 ],
 "kespro":[
  {"q":"Mama Ani baru tahu ia hamil 2 bulan. Kapan sebaiknya ia mulai periksa ke bidan?","o":["Sekarang juga, sejak awal kehamilannya","Nanti, saat perutnya mulai kelihatan","Menjelang melahirkan, cukup sekali saja"],"a":0,"why":"Periksa ke bidan sejak awal, minimal 6 kali selama hamil, dua kali di antaranya dengan dokter. Kalau ibu belum ingin orang lain tahu kehamilannya, kader bicara empat mata dan tidak mengumumkannya.","ref":"kespro-01"},
- {"q":"Bagaimana ibu hamil minum tablet tambah darah?","o":["Satu tablet saat pusing atau lemas saja","Satu tablet seminggu sekali selama hamil","Satu tablet setiap hari, minimal 90 tablet"],"a":2,"why":"Satu tablet setiap hari selama hamil, minimal 90 tablet. Kalau mual, minum malam sebelum tidur dengan air putih, jangan dengan teh atau kopi. Kalau ingin berhenti karena mual atau keluhan lain, bicarakan dulu dengan bidan.","ref":"kespro-03"},
+ {"q":"Bagaimana ibu hamil minum tablet tambah darah?","o":["Satu tablet saat pusing atau lemas saja","Satu tablet seminggu sekali selama hamil","Satu tablet setiap hari, minimal 90 tablet"],"a":2,"why":"Satu tablet setiap hari selama hamil, minimal 90 tablet. Kalau mual, minum setelah makan malam menjelang tidur, jangan saat perut kosong, dengan air putih, jangan dengan teh atau kopi. Kalau ingin berhenti karena mual atau keluhan lain, bicarakan dulu dengan bidan.","ref":"kespro-03"},
  {"q":"Ibu hamil 7 bulan sakit kepala sangat hebat sejak pagi. Wajah dan tangannya tidak bengkak. Apa yang dilakukan kader?","o":["Suruh istirahat dan minum obat sakit kepala dulu","Panggil bantuan dan berangkat sekarang","Ke bidan besok pagi kalau belum juga membaik"],"a":1,"why":"Sakit kepala hebat atau pandangan kabur pada ibu hamil adalah tanda bahaya yang bisa berujung kejang, walaupun tidak ada bengkak. Berangkat sekarang, jangan tunggu besok; berdoa dan berembuk bisa sambil jalan.","ref":"kespro-04"},
  {"q":"Apa yang perlu disepakati keluarga dalam rencana persalinan (P4K)?","o":["Ramuan, silet, dan dukun beranak di rumah","Penolong, tempat, kendaraan, dan calon donor darah","Cukup tanggal perkiraan lahir dan pakaian bayi"],"a":1,"why":"Rencana persalinan (P4K) disepakati jauh sebelum waktunya: penolong, tempat, pendamping, kendaraan dan sopir (juga malam hari), calon donor darah, dan biaya atau JKN. Ditulis di stiker; ibu dan keluarga yang menentukan isinya dan tempat menempelnya.","ref":"kespro-05"},
  {"q":"Bagaimana merawat tali pusat bayi baru lahir?","o":["Jaga bersih dan kering, jangan diberi apa pun","Olesi ramuan atau abu dapur agar cepat lepas","Bungkus rapat dengan gurita atau kain tebal"],"a":0,"why":"Tali pusat dijaga bersih dan kering tanpa diberi apa pun. Tali pusat merah, bernanah, atau berbau: ke bidan hari ini. Bayi tidak mau menyusu, lemas, kejang, atau sesak: berangkat sekarang.","ref":"kespro-07"}
@@ -2907,7 +2907,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
   /* ---------- catatan sesi tanpa nama (indikator proses untuk Puskesmas) ---------- */
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.10'}}
+  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.11'}}
   function used(s){return s&&(Object.keys(s.mods).length||s.say||s.act)}
   /* Satu pintu untuk mengganti sesi (ganti hari, ganti kampung, atau "Mulai sesi baru"):
      sesi lama diarsipkan bila ada kegiatannya, lalu bintang dan tanda "sudah dihitung" dimulai dari nol,
@@ -4437,7 +4437,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.10'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.11'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
