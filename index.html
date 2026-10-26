@@ -72,7 +72,7 @@ button{cursor:pointer}
 .menu{min-height:44px;padding:.3rem .8rem;border-radius:8px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:.9rem}
 .menu.sos{border-color:var(--sos);color:var(--sos)}
 [inert]{pointer-events:none}
-.slide h2:focus{outline:none}
+.slide h2:focus,#home h1:focus{outline:none}
 .brand{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Ilustrasi prosedur (SVG inline): mengikuti warna tema lewat currentColor/--pulse; keterangan di HTML supaya ikut A++ dan dibacakan. */
 .ill{margin:.6rem 0 1rem;max-width:26rem}
@@ -205,7 +205,9 @@ p{margin:0}
 .cpr{width:min(14rem,60vw);height:auto}
 .cpr .arms{transition:transform .07s ease-out}
 .cpr.push .arms{transform:translateY(7px)}
-.box.stop{border:2px solid var(--pulse)}
+/* Kotak gawat selalu merah (token --sos), tidak ikut warna modul. */
+.box.stop{border:2px solid var(--sos)}
+.box.stop>h3{color:var(--sos)}
 .status{display:grid;gap:.35rem;font-size:.95rem}
 .status span{display:flex;gap:.5rem;align-items:baseline}
 .status .dot{flex:none;width:.7rem;height:.7rem;border-radius:50%;background:var(--line);transform:translateY(.05rem)}
@@ -225,7 +227,9 @@ details.box summary{font-weight:700;cursor:pointer}
 
 .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.6rem}
 .numcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:.8rem 1rem}
-.numcard .d{font-family:var(--display);font-size:2.4rem;line-height:1;color:var(--pulse);font-variant-numeric:tabular-nums}
+.numcard{min-width:0}
+.numcard .d{font-family:var(--display);font-size:2.4rem;line-height:1;color:var(--pulse);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.numcard .d.kata{font-size:1.7rem}
 .numcard .l{font-size:.9rem;color:var(--muted)}
 label{display:grid;gap:.3rem;font-size:.95rem;font-weight:700}
 input[type=text],input[type=tel],input[type=number],select{min-height:48px;padding:.5rem .7rem;border-radius:10px;border:2px solid var(--line);background:var(--bg);width:100%}
@@ -385,6 +389,7 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
   :root[data-mod] .scores{display:none}
   .nav-in{grid-template-columns:1fr 1fr;gap:.5rem .6rem;padding:.45rem 12px}
   .nav-in .prog{grid-column:1/-1;order:-1;min-height:36px;padding:.1rem .3rem}
+  .toast{bottom:calc(8rem + env(safe-area-inset-bottom,0px))}
 }
 /* HP diputar mendatar (layar pendek): kepala ikut tergulir dan bilah bawah lebih tipis, supaya ruang isi tidak tinggal separuh layar. */
 @media (max-height:480px) and (orientation:landscape){.top{position:static}.nav-in{padding:.3rem 16px}.nav .btn{min-height:40px;padding:.35rem .9rem}.prog{min-height:32px}main{padding-bottom:calc(4.5rem + env(safe-area-inset-bottom,0px))}}
@@ -417,7 +422,8 @@ input[type=range]{width:min(16rem,100%);accent-color:var(--pulse);height:44px}
 @keyframes splashIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
 /* Kembali dari modul ke beranda: animasi sama, sedikit lebih cepat (selesai 1,3 detik). */
-.splash.ulang{animation-delay:.95s}
+.splash.ulang{animation-delay:.95s;pointer-events:none}
+.splash.ulang .splash-skip{visibility:hidden}
 .splash.ulang .splash-logo>*{animation-duration:.4s}
 .splash.ulang .splash-logo img:first-child{animation-delay:0s}
 .splash.ulang .splash-logo .splash-patriot{animation-delay:.1s}
@@ -478,7 +484,7 @@ p.box{display:block}
 bila aplikasi belum siap dalam 8 detik atau galat terjadi saat memuat, panel darurat cadangan ditampilkan. ?reset=1 menghapus
 simpanan luring aplikasi (bukan catatan, bukan rekaman) lalu memuat ulang. */
 (function(){var K='literasi-galat';window.__litOK=false;
-function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.9',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
+function log(m){try{var a=JSON.parse(localStorage.getItem(K)||'[]');if(!Array.isArray(a))a=[];a.push({t:new Date().toISOString(),v:'0.9.10',m:String(m).slice(0,240)});localStorage.setItem(K,JSON.stringify(a.slice(-20)))}catch(e){}}
 window.__litLog=log;
 function fail(){if(window.__litOK)return;var f=document.getElementById('boot-fail');if(f){f.hidden=false;f.setAttribute('data-sticky','1')}
 var n=document.getElementById('bf-note');if(n&&window.__litResetMsg){n.textContent=window.__litResetMsg;n.hidden=false}}
@@ -496,7 +502,7 @@ var wipe=function(){try{var jobs=[];if(navigator.serviceWorker&&navigator.servic
 if(window.caches)jobs.push(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return (k.indexOf(pre)===0&&/^v\d/.test(k.slice(pre.length)))||/^literasi-app-v\d/.test(k)}).map(function(k){return caches.delete(k)}))}));
 Promise.all(jobs).then(back,back);setTimeout(back,4000)}catch(e){back()}};
 var keep=function(){var sw=false;try{sw=!!navigator.serviceWorker.controller}catch(e){}
-var t='Perbaiki aplikasi butuh sinyal. Tidak ada yang dihapus'+(sw?'; aplikasi tetap bisa dipakai tanpa sinyal.':'. Coba lagi saat ada sinyal.');
+var t='Untuk memperbaiki aplikasi, HP perlu sinyal internet. Tidak ada yang dihapus'+(sw?'; aplikasi tetap bisa dipakai tanpa sinyal.':'. Coba lagi saat ada sinyal.');
 try{history.replaceState(history.state,'',location.pathname+location.hash)}catch(e){}
 if(window.__litNotice)window.__litNotice(t);else{window.__litResetMsg=t;var n=document.getElementById('bf-note');if(n){n.textContent=t;n.hidden=false}}};
 try{if(navigator.onLine===false)keep();else if(!window.fetch||!navigator.serviceWorker)wipe();else{var done=0,end=function(ok){if(done)return;done=1;if(ok)wipe();else keep()};
@@ -541,10 +547,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
         <button class="chip vo" data-vo="" aria-pressed="true">Bahasa Indonesia</button>
         <button class="chip vo" data-vo="papua" aria-pressed="false">Logat Papua</button>
       </div>
+      <p class="muted" id="vo-note" hidden></p>
       <label class="switch"><input type="checkbox" id="opt-auto"> Bacakan otomatis setiap pindah layar</label>
       <label class="switch"><input type="checkbox" id="opt-sfx" checked> Bunyi saat jawaban benar</label>
       <div class="row" id="print-row" hidden><button class="btn ghost" id="print-btn">Cetak modul ini sebagai lembar balik</button></div>
-      <div class="row"><a class="btn ghost" href="?reset=1" id="repair-link">Perbaiki aplikasi</a><span class="muted">Menghapus simpanan luring yang mungkin rusak lalu memuat ulang. Catatan sesi dan rekaman suara tetap. Butuh sinyal; tanpa sinyal tidak ada yang dihapus.</span></div>
+      <div class="row"><a class="btn ghost" href="?reset=1" id="repair-link">Perbaiki aplikasi</a><span class="muted">Menghapus salinan aplikasi yang tersimpan di HP, lalu mengunduhnya lagi. Catatan sesi dan rekaman suara tidak dihapus. Butuh sinyal; tanpa sinyal tidak ada yang dihapus.</span></div>
     </div>
   </div>
 </header>
@@ -552,7 +559,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <h2>Aplikasi belum termuat penuh</h2>
   <p>Untuk keadaan darurat, ini tetap bisa dipakai:</p>
   <p class="bf-calls"><a class="btn danger" href="tel:112">Telepon 112</a> <a class="btn danger" href="tel:119">Telepon 119</a></p>
-  <p><b>Tidak sadar dan tidak bernapas normal:</b> panggil bantuan, tekan tengah dada 5–6 cm, 100–120 kali per menit, tanpa berhenti. Anak: sepertiga tebal dada, satu tangan. Bayi: dua ibu jari melingkari dada.</p>
+  <p><b>Tidak sadar dan tidak bernapas normal:</b> panggil bantuan, tekan tengah dada 5–6 cm, 100–120 kali per menit, tanpa berhenti. Anak: sepertiga tebal dada, satu tangan. Bayi: kedua tangan melingkari dada, tekan dengan dua ibu jari.</p>
   <p><b>Berangkat sekarang bila:</b> perdarahan banyak, kejang, tidak sadar, sesak berat atau bibir biru, bayi tidak mau menyusu atau lemas, bayi muda demam atau badan dingin, digigit ular, tenggelam.</p>
   <p id="bf-note" hidden></p>
   <p class="bf-calls"><a class="btn ghost" href="">Muat ulang</a> <a class="btn ghost" href="?reset=1">Perbaiki aplikasi</a> <button class="btn ghost" type="button" onclick="this.parentNode.parentNode.hidden=true">Tutup</button></p>
@@ -588,13 +595,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <button class="chip" id="m-group" aria-pressed="false">Sesi kelompok, dipandu kader atau bidan</button>
       <button class="chip" id="m-solo" aria-pressed="false">Belajar sendiri</button>
     </div>
-    <p class="muted" id="star-note">Setiap kegiatan yang selesai menambah satu bintang, juga bila berhasil setelah mencoba lagi. Bintang tanda ikut berlatih, bukan nilai kemampuan; tidak ada peringkat dan tidak ada pengurangan.</p>
-    <h3>Suara Bacakan</h3>
-    <div class="row">
-      <button class="chip vo" data-vo="" aria-pressed="true">Bahasa Indonesia</button>
-      <button class="chip vo" data-vo="papua" aria-pressed="false">Logat Papua</button>
-    </div>
-    <p class="muted" id="vo-note" hidden></p>
+    <p class="muted" id="star-note">Setiap kegiatan yang selesai menambah satu bintang: tanda sudah ikut berlatih, bukan nilai, tanpa peringkat. Pilihan suara untuk Bacakan ada di tombol Aa.</p>
     <div id="kp-setup" hidden>
       <p class="muted">Sesi ini di mana? Hanya untuk catatan Puskesmas, boleh dilewati. <b>Jangan menulis nama orang.</b></p>
       <div class="row" id="kp-chips"></div>
@@ -604,7 +605,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="mods" id="mods"></div>
   <div class="box tes-panel" id="tes-panel">
     <h3>Tes awal dan tes akhir</h3>
-    <p class="muted">Setiap modul punya 5 soal. Kerjakan <b>Tes awal</b> sebelum belajar dan <b>Tes akhir</b> sesudahnya; jawaban sebelum dan sesudah ditampilkan berdampingan, lengkap dengan kunci jawaban dan penjelasan. Ini latihan, bukan ujian kemampuan; keterampilan menolong tetap dinilai dengan peragaan.</p>
+    <p class="muted">Setiap modul punya 5 soal. Kerjakan <b>Tes awal</b> sebelum belajar dan <b>Tes akhir</b> sesudahnya; hasil sebelum dan sesudah ditampilkan berdampingan, lengkap dengan kunci jawaban dan penjelasan. Ini latihan, bukan ujian; keterampilan menolong tetap dinilai lewat peragaan langsung.</p>
     <div class="tes-rows" id="tes-rows"></div>
   </div>
   <div class="box status" id="status" aria-live="polite">
@@ -622,6 +623,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="muted">Catatan ini tidak memuat nama dan tidak memuat jawaban per orang. Yang dicatat hanya tanggal, tempat, modul yang dibuka dan modul yang semua layarnya sudah dibuka, berapa kali Bacakan dipakai, apakah dipakai tanpa sinyal, dan jumlah jawaban benar pada tes awal dan tes akhir. Catatan hanya ada di HP ini sampai kamu menyalinnya. Jawaban tes belajar sendiri juga tersimpan di HP ini supaya pembahasannya bisa dibuka lagi; ikut terhapus dengan tombol hapus di bawah.</p>
     <div class="log-list" id="log-list"></div>
     <div class="row"><button class="btn" id="log-wa">Kirim ringkasan (WhatsApp dll.)</button><button class="btn ghost" id="log-copy">Salin ringkasan</button></div>
+    <div class="row"><button class="btn ghost" id="log-cadang" type="button">Salin tautan cadangan catatan</button></div>
+    <p class="muted">Untuk pindah HP atau berjaga-jaga: simpan tautan ini, misalnya kirim ke diri sendiri. Membukanya di HP lain memulihkan catatan sesi, nomor jaga, dan pengaturan; catatan yang sudah ada di HP itu tidak dihapus.</p>
     <p class="muted">Yang dikirim persis seperti daftar di atas. HP dipakai bersama atau akan diserahkan ke orang lain? Hapus catatannya dulu.</p>
     <div class="row"><button class="btn ghost" id="log-clear">Hapus semua catatan di HP ini</button></div>
   </details>
@@ -643,18 +646,18 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Foto klinis frambusia: Dofitas dkk., Infect Dis Poverty 2020 (foto Dr. Camille Toledo) · CC BY 4.0</li>
     </ul>
   </details>
-  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.9, 25 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
+  <p class="foot">Aplikasi ini pelengkap, bukan pengganti latihan langsung dan pemeriksaan oleh bidan, perawat, atau dokter. Kader mengenali, mengingatkan, dan mengantar; yang memeriksa dan memberi obat adalah tenaga kesehatan. Prototipe versi 0.9.10, 26 Oktober 2026, disusun Tim TEP 7 ITS. Perlu ditinjau Puskesmas Momiwaren dan Dinas Kesehatan Manokwari Selatan sebelum dipakai. <a href="sumber.html">Sumber per klaim</a> · <a href="tinjauan.html">Tinjauan klinis</a> · <a href="sumber-foto.html">Sumber foto</a>.</p>
 </section>
 <div class="hint" id="hint" hidden><span>Geser layar ke kiri atau tekan <b>Lanjut</b>. Tekan <b>Bacakan</b> untuk mendengar isi layar.</span><button class="btn ghost" id="hint-ok">Mengerti</button></div>
 <div class="deck" data-mod="bls" data-cover="img/dermaga-sumano.webp" data-pos="center 55%" data-credit="Dermaga kecil, Kampung Sumano · Lefaan · CC BY-SA 4.0" data-n="1" data-title="Bantuan Hidup Dasar" data-desc="Menolong orang yang tiba-tiba tidak sadar dan tidak bernapas normal: periksa, panggil, tekan." hidden>
 
-<section class="slide" data-key="bls-00" data-say="Bantuan Hidup Dasar. Saat orang tiba-tiba jatuh, tidak sadar, dan tidak bernapas normal, tangan kita bisa menjaga darah tetap mengalir ke otak sampai bantuan datang. Langkah utama di modul ini untuk orang dewasa dan remaja yang sudah tampak dewasa. Anak yang belum puber dan bayi punya layar sendiri.">
+<section class="slide" data-key="bls-00" data-say="Bantuan Hidup Dasar. Saat orang tiba-tiba jatuh, tidak sadar, dan tidak bernapas normal, tangan kita bisa menjaga darah tetap mengalir ke otak sampai bantuan datang. Langkah utama di modul ini untuk orang dewasa, termasuk remaja yang badannya sudah seperti orang dewasa. Untuk anak dan bayi ada layar tersendiri.">
   <p class="eyebrow">Modul 1 dari 5</p>
   <h2>Bantuan Hidup Dasar</h2>
   <p class="lead">Saat orang tiba-tiba jatuh, tidak sadar, dan tidak bernapas normal, tangan kita bisa menjaga darah tetap mengalir ke otak sampai bantuan datang.</p>
-  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Mengenali orang yang tidak sadar dan tidak bernapas normal, termasuk napas megap-megap.</li><li>Memanggil bantuan dengan pengeras suara sambil memeriksa napas.</li><li>Menekan dada dengan irama 100–120 per menit; kedalaman sesuai umur (dinilai dengan manekin).</li><li>Membedakan langkah untuk dewasa, anak, dan bayi.</li></ol></div>
+  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Mengenali orang yang tidak sadar dan tidak bernapas normal, termasuk napas megap-megap.</li><li>Menelepon minta bantuan dengan speaker HP menyala, sambil memeriksa napas.</li><li>Menekan dada dengan irama 100–120 per menit; kedalaman sesuai umur (dinilai dengan manekin).</li><li>Membedakan langkah untuk dewasa, anak, dan bayi.</li></ol></div>
   <p class="box tip">Keterampilan menekan dada hanya bisa dilatih dengan manekin dan dinilai oleh bidan atau perawat. Modul ini untuk mengingat langkah dan berlatih irama.</p>
-  <p class="box key"><b>Untuk siapa:</b> langkah utama modul ini untuk <b>orang dewasa dan remaja yang sudah tampak dewasa</b> (sudah puber). Anak yang belum puber dan bayi berbeda: lihat layar <b>Anak dan bayi</b>.</p>
+  <p class="box key"><b>Untuk siapa:</b> langkah utama modul ini untuk <b>orang dewasa</b>, termasuk remaja yang badannya sudah seperti orang dewasa. Anak dan bayi lain caranya: lihat layar <b>Anak dan bayi</b>.</p>
 </section>
 
 <section class="slide" data-key="bls-90" hidden data-say="Tes awal. Tebak dulu. Lima pertanyaan singkat sebelum belajar. Belum tahu jawabannya tidak apa-apa, tebak saja. Kunci jawaban dan pembahasannya dibuka di akhir modul.">
@@ -664,7 +667,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box tes" data-id="tes-awal" data-phase="pre"></div>
 </section>
 
-<section class="slide" data-key="bls-01" hidden data-say="Tiga langkah menyelamatkan nyawa. Satu, periksa: tempatnya aman, orangnya sadar atau tidak. Dua, panggil: tidak sadar, langsung telepon dengan pengeras suara atau teriak minta tolong, sambil melihat napasnya. Tiga, tekan: tidak bernapas normal, tekan dada kuat dan cepat.">
+<section class="slide" data-key="bls-01" hidden data-say="Tiga langkah menyelamatkan nyawa. Satu, periksa: apakah tempatnya aman, dan apakah orangnya sadar. Dua, panggil: kalau tidak sadar, langsung telepon dengan speaker HP menyala, atau teriak minta tolong, sambil melihat napasnya. Tiga, tekan: kalau napasnya tidak normal, tekan dada kuat dan cepat.">
   <p class="eyebrow">Gambaran besar</p>
   <h2>Tiga langkah menyelamatkan nyawa</h2>
   <ol class="steps3">
@@ -673,7 +676,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <b>Periksa</b><span class="muted">Tempatnya aman? Orangnya sadar?</span></li>
     <li><span class="num">2</span>
       <svg viewBox="0 0 48 48" aria-hidden="true"><rect class="fig-ink" stroke-width="3" x="14" y="4" width="20" height="40" rx="4"/><circle class="fig-pulse" cx="24" cy="37" r="3"/><path class="fig-ink" stroke-width="3" d="M38 14c3 3 3 9 0 12M42 10c5 5 5 15 0 20"/></svg>
-      <b>Panggil</b><span class="muted">Tidak sadar? Telepon dengan pengeras suara, atau teriak minta tolong, sambil melihat napasnya.</span></li>
+      <b>Panggil</b><span class="muted">Tidak sadar? Telepon dengan speaker HP menyala, atau teriak minta tolong, sambil melihat napasnya.</span></li>
     <li><span class="num">3</span>
       <svg viewBox="0 0 48 48" aria-hidden="true"><rect class="fig-ink" stroke-width="3" x="12" y="6" width="24" height="10" rx="5"/><rect class="fig-ink" stroke-width="3" x="12" y="18" width="24" height="10" rx="5"/><path class="fig-pulse" d="M24 46l-8-10h16z"/></svg>
       <b>Tekan</b><span class="muted">Tidak bernapas normal? Tekan dada kuat dan cepat sampai bantuan datang.</span></li>
@@ -745,10 +748,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="bls-04" hidden data-say="Panggil. Orang tidak sadar? Telepon sekarang, nyalakan pengeras suara, lalu periksa napas sambil menunggu diangkat. Tidak ada sinyal? Teriak minta tolong. Suruh satu orang lari ke Puskesmas atau rumah bidan, dan satu orang menyiapkan kendaraan kampung.">
+<section class="slide" data-key="bls-04" hidden data-say="Panggil. Orang tidak sadar? Telepon sekarang, nyalakan speaker HP, lalu periksa napas sambil menunggu diangkat. Tidak ada sinyal? Teriak minta tolong. Suruh satu orang lari ke Puskesmas atau rumah bidan, dan satu orang menyiapkan kendaraan kampung.">
   <p class="eyebrow"><span class="n">Langkah 2</span> · Panggil</p>
-  <h2>Telepon sekarang, pakai pengeras suara</h2>
-  <p class="lead">Tekan tombol pengeras suara supaya tanganmu bebas, lalu periksa napas sambil menunggu telepon diangkat.</p>
+  <h2>Telepon sekarang, nyalakan speaker HP</h2>
+  <p class="lead">Tekan tombol speaker (pengeras suara) di layar HP supaya tanganmu bebas, lalu periksa napas sambil menunggu telepon diangkat.</p>
   <div class="nums">
     <div class="numcard"><a class="d" href="tel:112" aria-label="Telepon 112">112</a><div class="l">Panggilan darurat</div></div>
     <div class="numcard"><a class="d" href="tel:119" aria-label="Telepon 119">119</a><div class="l">Gawat darurat kesehatan</div></div>
@@ -768,7 +771,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <h3>Susun pesan singkat untuk petugas</h3>
     <div class="row">
       <label style="flex:1 1 12rem">Siapa
-        <select id="msg-who"><option>laki-laki dewasa</option><option>perempuan dewasa</option><option>orang tua</option><option>remaja</option></select>
+        <select id="msg-who"><option>laki-laki dewasa</option><option>perempuan dewasa</option><option>orang lanjut usia</option><option>remaja</option></select>
       </label>
       <label style="flex:2 1 14rem">Di mana
         <input id="msg-where" type="text" placeholder="contoh: Kampung Dembek, dekat gereja">
@@ -829,7 +832,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <path class="ac" d="M15 37L33 55M33 37L15 55" stroke-width="4"/>
 </g>
 </g>
-</svg><figcaption id="cap-bls-05">Kiri: napas normal, dada naik-turun teratur seperti orang tidur. Kanan: bukan napas normal, megap-megap satu-satu, dada hampir tidak bergerak. Yang dilihat iramanya, bukan mulut terbuka atau tertutup. Ragu? Anggap tidak normal dan mulai tekan dada.</figcaption></figure>
+</svg><figcaption id="cap-bls-05">Kiri: napas normal, dada naik-turun teratur seperti orang tidur. Kanan: bukan napas normal, megap-megap satu-satu, dada hampir tidak bergerak. Perhatikan iramanya; mulut terbuka atau tertutup tidak menentukan. Ragu? Anggap tidak normal dan mulai tekan dada.</figcaption></figure>
   <div class="box quiz" data-id="napas1">
     <p class="q">Bapa tidak merespons. Dadanya naik turun teratur, tidak ada suara aneh.</p>
     <div class="pair">
@@ -856,11 +859,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="bls-06" hidden data-say="Tekan. Untuk orang yang tidak sadar dan tidak bernapas normal, setelah bantuan dipanggil. Berlutut di samping. Letakkan tumit telapak tangan di tengah dada, tangan lain di atasnya, jari dikunci. Lengan lurus, bahu tegak di atas dada. Tekan sedalam lima sampai enam sentimeter, lalu biarkan dada naik penuh. Jangan berhenti lama. Tekan Nyalakan ketukan untuk bunyi pemandu irama.">
+<section class="slide" data-key="bls-06" hidden data-say="Tekan dada. Ini untuk orang yang tidak sadar dan tidak bernapas normal, setelah bantuan dipanggil. Berlutut di samping. Letakkan tumit telapak tangan di tengah dada, tangan lain di atasnya, jari dikunci. Lengan lurus, bahu tegak di atas dada. Tekan sedalam lima sampai enam sentimeter, lalu biarkan dada naik penuh. Jangan berhenti lama. Ketuk tombol Nyalakan ketukan untuk mendengar bunyi pemandu irama.">
   <p class="eyebrow"><span class="n">Langkah 3</span> · Tekan</p>
   <h2>Tekan di tengah dada</h2>
   <p class="lead">Untuk orang yang <b>tidak sadar dan tidak bernapas normal</b>, setelah bantuan dipanggil.</p>
-  <div class="stats"><div class="stat"><b>5–6</b><span>cm dalamnya (orang yang tampak dewasa)</span></div><div class="stat"><b>100–120</b><span>tekanan per menit</span></div><div class="stat"><b>30 : 2</b><span>tekan : napas, bila terlatih</span></div></div>
+  <div class="stats"><div class="stat"><b>5–6</b><span>cm dalamnya (orang dewasa)</span></div><div class="stat"><b>100–120</b><span>tekanan per menit</span></div><div class="stat"><b>30 : 2</b><span>tekan : napas, bila terlatih</span></div></div>
   <div class="box key metro-quick">
     <div class="metro"><button class="btn big metro-btn" type="button">Nyalakan ketukan</button><span class="beat" aria-hidden="true"></span><span class="count metro-count" aria-live="off"></span></div>
     <p class="muted">Bunyi pemandu <b class="bpm-now">110</b> kali per menit: taruh HP di samping, tekan dada mengikuti bunyinya. Saat memberi 2 napas, abaikan hitungannya, lalu lanjut tekan mengikuti bunyi. Ketukan berhenti bila pindah layar, layar HP mati, atau HP dipakai menelepon; kalau bisa, telepon dengan HP lain.</p>
@@ -872,8 +875,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <path class="fig-ink fig-line" stroke-width="2" d="M130 60c-30 4-52 14-70 30M130 84c-30 4-52 14-70 30M130 108c-30 4-52 14-70 30M130 60c30 4 52 14 70 30M130 84c30 4 52 14 70 30M130 108c30 4 52 14 70 30"/>
       <circle class="fig-pulse" cx="130" cy="120" r="14" opacity=".9"/>
       <circle cx="130" cy="120" r="24" fill="none" stroke="var(--pulse)" stroke-width="2" stroke-dasharray="4 4"/>
-      <text class="fig-text" x="166" y="124">tekan di sini</text>
-      <text class="fig-muted" x="136" y="30">tulang dada</text>
+      <text class="fig-text" x="130" y="164" text-anchor="middle">tekan di sini</text>
+      <text class="fig-muted" x="138" y="50">tulang dada</text>
     </svg>
     <svg viewBox="0 0 160 230" role="img" aria-label="Kedalaman tekanan 5 sampai 6 sentimeter">
       <rect x="40" y="20" width="36" height="190" rx="6" class="fig-fill fig-ink" stroke-width="2"/>
@@ -894,7 +897,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <li>Jangan berhenti lama di antara tekanan.</li>
   </ol>
   <p class="box tip">Di atas kasur empuk? Jangan buang waktu memindahkan. Mulai di situ dan tekan lebih dalam.</p>
-  <p class="box key"><b>Anak:</b> sepertiga tebal dada, satu tangan. <b>Bayi:</b> dua ibu jari melingkari dada. Lihat layar <b>Anak dan bayi</b>.</p>
+  <p class="box key"><b>Anak:</b> sepertiga tebal dada, satu tangan. <b>Bayi:</b> kedua tangan melingkari dada, dua ibu jari menekan. Lihat layar <b>Anak dan bayi</b>.</p>
 </section>
 
 <section class="slide" data-key="bls-07" hidden data-say="Latihan irama. Kecepatan seratus sampai seratus dua puluh tekanan per menit. Taruh HP di samping manekin, nyalakan ketukan, dan tekan dada mengikuti bunyi. Lingkaran ketuk hanya untuk latihan. Saat kejadian nyata: pastikan orangnya tidak sadar dan tidak bernapas normal, suruh orang lain memanggil petugas dan menyiapkan kendaraan, baru nyalakan ketukan, taruh HP di samping, dan tekan dengan dua tangan.">
@@ -1081,7 +1084,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="box tip">Tetap antar ke Puskesmas. Tidak sadar bisa karena malaria berat, kejang, atau gula darah rendah. Jangan beri minum selama belum sadar penuh.</p>
 </section>
 
-<section class="slide" data-key="bls-11" hidden data-say="Anak dan bayi. Layar ini untuk anak yang belum puber dan bayi; remaja yang sudah tampak dewasa memakai langkah dewasa, dan bayi yang baru lahir tidak bernapas ditangani bidan. Pada anak, jantung biasanya berhenti karena kehabisan napas: tenggelam, tersedak, atau sesak. Karena itu napas buatan lebih penting. Tidak sadar dan tidak bernapas normal? Panggil bantuan dengan pengeras suara. Bila sudah dilatih: beri lima napas buatan dulu, lalu tiga puluh tekanan dan dua napas. Belum dilatih: tekan dada terus. Tekan sepertiga tebal dada: anak dengan pangkal satu tangan; bayi dengan dua ibu jari di tengah dada, jari lain melingkari punggungnya. Tidak bisa melingkari dada bayi? Pakai pangkal satu tangan. Jangan pakai dua jari. Kecepatan sama, seratus sampai seratus dua puluh per menit. Sendirian tanpa HP? Lakukan satu menit dulu, baru cari bantuan. Tekan Nyalakan ketukan untuk bunyi pemandu irama.">
+<section class="slide" data-key="bls-11" hidden data-say="Anak dan bayi. Layar ini untuk anak dan bayi. Remaja yang badannya sudah seperti orang dewasa memakai cara dewasa. Bayi yang baru lahir dan tidak menangis atau tidak bernapas: panggil bidan sekarang, sambil mengeringkan dan menghangatkan bayi. Pada anak, jantung biasanya berhenti karena kehabisan napas: tenggelam, tersedak, atau sesak. Karena itu napas buatan lebih penting. Tidak sadar dan tidak bernapas normal? Telepon minta bantuan dengan speaker HP menyala. Bila sudah dilatih: beri lima napas buatan dulu, lalu tiga puluh tekanan dan dua napas. Belum dilatih: tekan dada terus. Tekan sepertiga tebal dada: anak dengan pangkal satu tangan; bayi dengan dua ibu jari di tengah dada, jari lain melingkari punggungnya. Tidak bisa melingkari dada bayi? Pakai pangkal satu tangan. Jangan pakai dua jari. Kecepatan sama, seratus sampai seratus dua puluh per menit. Sendirian tanpa HP? Lakukan pertolongan tadi selama satu menit dulu, baru cari bantuan. Ketuk tombol Nyalakan ketukan untuk mendengar bunyi pemandu irama.">
   <p class="eyebrow">Keadaan khusus</p>
   <h2>Anak dan bayi</h2>
   <p class="lead">Pada anak, jantung biasanya berhenti karena <b>kehabisan napas</b>: tenggelam, tersedak, atau sesak berat. Karena itu napas buatan lebih penting daripada pada orang dewasa.</p>
@@ -1134,21 +1137,21 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 </g>
 </svg><figcaption id="cap-bls-11">Atas: anak. Berlutut di samping anak, bahu tepat di atas dada, lengan lurus; tekan bagian bawah tulang dada dengan pangkal satu telapak tangan, sekitar sepertiga tebal dada. Bawah: bayi. Lingkari dadanya dengan kedua tangan; dua ibu jari berdampingan di tengah dada, tepat di bawah garis puting (garis putus-putus). Tangan tidak bisa melingkari dada bayi? Pakai pangkal satu tangan.</figcaption></figure>
   <div class="grid2">
-    <div class="box key"><h3>Anak, 1 tahun sampai sebelum puber</h3>
-      <ol class="list"><li>Tidak sadar, tidak bernapas normal: panggil bantuan dengan pengeras suara.</li><li>Sudah dilatih: <b>5 napas buatan dulu</b>, lalu 30 tekanan dan 2 napas.</li><li>Tekan <b>sepertiga tebal dada</b> dengan tumit satu tangan (anak besar: dua tangan).</li><li>Sudah puber atau tampak dewasa? Pakai langkah dewasa (layar Tekan).</li></ol></div>
+    <div class="box key"><h3>Anak, umur 1 tahun sampai masa puber</h3>
+      <ol class="list"><li>Tidak sadar, tidak bernapas normal: telepon minta bantuan dengan speaker HP menyala.</li><li>Sudah dilatih: <b>5 napas buatan dulu</b>, lalu 30 tekanan dan 2 napas.</li><li>Tekan <b>sepertiga tebal dada</b> dengan tumit satu tangan (anak besar: dua tangan).</li><li>Badannya sudah seperti orang dewasa? Pakai cara dewasa (layar Tekan).</li></ol></div>
     <div class="box key"><h3>Bayi, di bawah 1 tahun</h3>
-      <ol class="list"><li>Sama: panggil bantuan, 5 napas buatan dulu bila dilatih. Mulut penolong menutup hidung dan mulut bayi.</li><li>Lingkari dada bayi dengan kedua tangan: <b>dua ibu jari</b> berdampingan di tengah dada tepat di bawah garis puting, jari lain menyangga punggung. Tekan <b>sepertiga tebal dada</b>.</li><li>Tangan tidak bisa melingkari dadanya? Tekan dengan pangkal satu tangan. <b>Jangan</b> dua jari (terlalu dangkal), jangan dua tangan, jangan sedalam 5–6 cm.</li><li><b>Bukan untuk bayi yang baru lahir.</b> Bayi baru lahir yang tidak menangis atau tidak bernapas: panggil bidan sekarang, sambil mengeringkan dan menghangatkannya. Pertolongannya dilatih tersendiri.</li></ol></div>
+      <ol class="list"><li>Sama: panggil bantuan, 5 napas buatan dulu bila sudah terlatih. Mulut penolong menutup hidung dan mulut bayi.</li><li>Lingkari dada bayi dengan kedua tangan: <b>dua ibu jari</b> berdampingan di tengah dada tepat di bawah garis puting, jari lain menyangga punggung. Tekan <b>sepertiga tebal dada</b>.</li><li>Tangan tidak bisa melingkari dadanya? Tekan dengan pangkal satu tangan. <b>Jangan</b> dua jari (terlalu dangkal), jangan dua tangan, jangan sedalam 5–6 cm.</li><li><b>Bayi yang baru lahir lain caranya.</b> Kalau tidak menangis atau tidak bernapas, panggil bidan sekarang, sambil mengeringkan dan menghangatkan bayi.</li></ol></div>
   </div>
   <ol class="list">
     <li>Kecepatan sama untuk semua umur: <b>100–120 per menit</b>. Biarkan dada naik penuh.</li>
     <li>Belum dilatih napas buatan? Tekan dada terus. Itu tetap menolong.</li>
-    <li>Sendirian dan tidak ada HP? Lakukan <b>1 menit</b> dulu, baru cari bantuan. Bayi bisa digendong sambil menekan.</li>
+    <li>Sendirian dan tidak ada HP? Lakukan pertolongan tadi selama <b>1 menit</b> dulu, baru cari bantuan. Bayi bisa digendong sambil menekan.</li>
   </ol>
   <div class="box quiz" data-id="anakbayi">
     <p class="q">Bayi 8 bulan tidak sadar dan tidak bernapas normal. Bagaimana menekan dadanya?</p>
     <div class="opts">
-      <button class="opt" data-ok="1" data-fb="Benar. Dua ibu jari melingkari dada, sepertiga tebal dada, 100–120 per menit; 5 napas buatan dulu bila sudah dilatih.">Dua ibu jari melingkari dada, sepertiga tebal dada</button>
-      <button class="opt" data-ok="0" data-fb="Dua tangan dan 5–6 cm itu untuk orang dewasa. Pada bayi: dua ibu jari melingkari dada, sepertiga tebal dada.">Dua tangan, sedalam 5–6 cm seperti dewasa</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Kedua tangan melingkari dada, dua ibu jari menekan sepertiga tebal dada, 100–120 per menit; 5 napas buatan dulu bila sudah dilatih.">Tangan melingkari dada, dua ibu jari menekan sepertiga tebal dada</button>
+      <button class="opt" data-ok="0" data-fb="Dua tangan dan 5–6 cm itu untuk orang dewasa. Pada bayi: kedua tangan melingkari dada, dua ibu jari menekan sepertiga tebal dada.">Dua tangan, sedalam 5–6 cm seperti dewasa</button>
       <button class="opt" data-ok="0" data-fb="Menunggu membuang waktu. Tekan dada, dan beri napas buatan bila sudah dilatih, sambil orang lain memanggil bantuan.">Jangan ditekan, tunggu bidan datang</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -1156,9 +1159,9 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="muted">Keterampilan ini dilatih dengan manekin bayi dan anak, dinilai bidan atau perawat.</p>
 </section>
 
-<section class="slide" data-key="bls-12" hidden data-say="Tenggelam. Tolong dari darat dulu: ulurkan kayu, tali, atau jeriken kosong. Jangan ikut terjun kecuali sudah terlatih menolong orang di air. Setelah di darat, baringkan di tempat datar dan periksa sadar dan napas. Tidak sadar dan tidak bernapas normal? Bila sudah dilatih, beri lima napas buatan dulu, lalu tiga puluh tekanan dan dua napas. Belum dilatih? Tekan dada terus. Anak: tekan sepertiga tebal dada dengan satu tangan; bayi dengan dua ibu jari melingkari dada. Jangan gantung terbalik dan jangan tekan perutnya untuk mengeluarkan air. Berangkat sekarang ke Puskesmas walau sudah sadar kembali, karena sesak bisa muncul beberapa jam kemudian.">
+<section class="slide" data-key="bls-12" hidden data-say="Tenggelam. Tolong dari darat dulu: ulurkan kayu, tali, atau jeriken kosong. Jangan ikut terjun kecuali sudah terlatih menolong orang di air. Setelah di darat, baringkan di tempat datar dan periksa apakah ia sadar dan bernapas normal. Tidak sadar dan tidak bernapas normal? Bila sudah dilatih, beri lima napas buatan dulu, lalu tiga puluh tekanan dan dua napas. Belum dilatih? Tekan dada terus. Anak: tekan sepertiga tebal dada dengan satu tangan; bayi dengan dua ibu jari, kedua tangan melingkari dadanya. Jangan gantung terbalik dan jangan tekan perutnya untuk mengeluarkan air. Berangkat sekarang ke Puskesmas walau sudah sadar kembali, karena sesak bisa muncul beberapa jam kemudian.">
   <p class="eyebrow">Keadaan khusus</p>
-  <h2>Tenggelam: yang dibutuhkan udara</h2>
+  <h2>Tenggelam: beri udara, bukan keluarkan air</h2>
   <p class="lead">Orang tenggelam kehabisan udara. Jangan buang waktu mencoba mengeluarkan air.</p>
   <figure class="ill"><svg aria-describedby="cap-bls-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Penolong berlutut rendah di tepi kali, tetap di darat, mengulurkan sebatang kayu panjang kepada orang di air yang memegang ujungnya. Di pojok, gambar orang terjun ke air dicoret: jangan ikut terjun kecuali sudah terlatih menolong orang di air.">
 <style>
@@ -1204,16 +1207,16 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 </svg><figcaption id="cap-bls-12">Tetap di darat, rendahkan badan (berlutut atau tiarap) supaya tidak ikut tertarik, lalu ulurkan kayu, tali, atau jeriken kosong. Jangan ikut terjun kecuali sudah terlatih menolong orang di air.</figcaption></figure>
   <ol class="list">
     <li><b>Tolong dari darat dulu:</b> ulurkan kayu, tali, atau jeriken kosong. Jangan ikut terjun kecuali sudah terlatih menolong orang di air.</li>
-    <li>Setelah di darat, baringkan di tempat datar. Periksa sadar dan napas.</li>
+    <li>Setelah di darat, baringkan di tempat datar. Periksa apakah ia sadar dan bernapas normal.</li>
     <li>Tidak sadar dan tidak bernapas normal: bila sudah dilatih, <b>5 napas buatan dulu</b>, lalu 30 tekanan dan 2 napas. Belum dilatih: tekan dada terus.</li>
-    <li>Anak: tekan sepertiga tebal dadanya dengan satu tangan; bayi dengan dua ibu jari melingkari dada (lihat layar Anak dan bayi).</li>
+    <li>Anak: tekan sepertiga tebal dadanya dengan satu tangan; bayi dengan dua ibu jari, kedua tangan melingkari dadanya (lihat layar Anak dan bayi).</li>
     <li>Muntah? Miringkan sebentar, bersihkan mulut, lalu lanjutkan.</li>
   </ol>
   <p class="box key"><b>Jangan</b> menggantung korban terbalik, mengguncang, atau menekan perutnya untuk mengeluarkan air.</p>
   <div class="box quiz" data-id="tenggelam">
     <p class="q">Anak ditarik dari kali dan tidak bernapas. Seorang bapa ingin menggantungnya terbalik supaya airnya keluar.</p>
     <div class="opts">
-      <button class="opt" data-ok="0" data-fb="Menggantung terbalik membuang waktu dan bisa membuat muntahan masuk ke paru. Yang dibutuhkan udara.">Biarkan, supaya air keluar dulu</button>
+      <button class="opt" data-ok="0" data-fb="Menggantung terbalik membuang waktu dan bisa membuat muntahan masuk ke paru. Yang dibutuhkan korban adalah udara.">Biarkan, supaya air keluar dulu</button>
       <button class="opt" data-ok="1" data-fb="Benar. Baringkan datar, minta orang memanggil bantuan, lalu napas buatan dan tekan dada.">Baringkan datar, panggil bantuan, mulai napas buatan dan tekan dada</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -1221,12 +1224,12 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="box stop"><b>Berangkat sekarang ke Puskesmas</b>, walau sudah sadar kembali. Sesak bisa muncul beberapa jam kemudian.</p>
 </section>
 
-<section class="slide" data-key="bls-13" hidden data-say="Setelah menolong. Menolong orang yang jantungnya berhenti bisa membuat kita terguncang, apa pun hasilnya. Wajar merasa sedih, takut, atau terus terbayang. Ceritakan pada bidan, kader lain, atau orang yang kamu percaya.">
+<section class="slide" data-key="bls-13" hidden data-say="Setelah menolong. Menolong orang yang jantungnya berhenti bisa membuat kita terguncang, apa pun hasilnya. Wajar kalau kamu merasa sedih, takut, atau terus teringat kejadian itu. Ceritakan pada bidan, kader lain, atau orang yang kamu percaya. Kalau berminggu-minggu tidak membaik, minta bantuan ke Puskesmas. Kamu sudah berbuat yang terbaik dengan menolong.">
   <p class="eyebrow">Setelah menolong</p>
   <h2>Perasaanmu juga penting</h2>
   <p class="lead">Menolong orang yang jantungnya berhenti bisa membuat kita terguncang, apa pun hasilnya.</p>
   <ol class="list">
-    <li>Wajar merasa sedih, takut, atau terus terbayang.</li>
+    <li>Wajar kalau kamu merasa sedih, takut, atau terus teringat kejadian itu.</li>
     <li>Ceritakan pada bidan, kader lain, atau orang yang kamu percaya.</li>
     <li>Kalau berminggu-minggu tidak membaik, minta bantuan ke Puskesmas.</li>
   </ol>
@@ -1242,7 +1245,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <div class="seq-pool">
       <button class="opt" data-order="1">Pastikan tempatnya aman</button>
       <button class="opt" data-order="2">Tepuk bahu dan panggil keras</button>
-      <button class="opt" data-order="3">Telepon dengan pengeras suara atau teriak minta tolong</button>
+      <button class="opt" data-order="3">Telepon dengan speaker HP atau teriak minta tolong</button>
       <button class="opt" data-order="4">Periksa napas: normal atau tidak</button>
       <button class="opt" data-order="5">Tekan dada 5–6 cm, 100–120 per menit</button>
       <button class="opt" data-order="6">30:2 bila terlatih, atau tekan terus</button>
@@ -1265,13 +1268,13 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     ["Langsung beri air minum",0,"Orang yang tidak sadar bisa tersedak. Jangan beri minum."],
     ["Tunggu dia bangun sendiri",0,"Menunggu membuang waktu yang berharga."]]},
   {"t":"Bapa Yohanis tidak menjawab dan tidak bergerak.","q":"Apa yang kalian lakukan?","o":[
-    ["Mama Sara telepon dengan pengeras suara atau lari minta tolong, kamu periksa napasnya",1,"Benar. Bagi tugas: satu memanggil bantuan, satu menolong."],
+    ["Mama Sara menelepon dengan speaker HP atau lari minta tolong, kamu periksa napasnya",1,"Benar. Bagi tugas: satu memanggil bantuan, satu menolong."],
     ["Kalian berdua lari mencari mobil",0,"Jangan tinggalkan dia sendirian bila ada dua orang."],
     ["Gosok badannya dengan minyak",0,"Itu tidak menolong jantung yang berhenti."]]},
   {"t":"Napasnya megap-megap, hanya sesekali.","q":"Apa artinya?","o":[
     ["Dia masih bernapas, tunggu saja",0,"Napas megap-megap bukan napas normal."],
     ["Jantungnya berhenti. Mulai tekan dada 100–120 per menit",1,"Benar. Mulai tekan dada sekarang."],
-    ["Angkat kakinya tinggi-tinggi",0,"Yang ia butuhkan adalah tekanan dada."]]},
+    ["Angkat kakinya tinggi-tinggi",0,"Yang ia butuhkan sekarang tekanan dada."]]},
   {"t":"Sudah lama menekan, petugas belum datang, dan kamu mulai lelah.","q":"Apa yang kamu lakukan?","o":[
     ["Berhenti dan istirahat lama",0,"Jeda lama membuat darah berhenti mengalir ke otak."],
     ["Bergantian dengan Mama Sara, tukar dengan cepat",1,"Benar. Bergantian supaya tekanan tetap kuat."]]}
@@ -1287,19 +1290,19 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box tes" data-id="tes-akhir" data-phase="post"></div>
 </section>
 
-<section class="slide" data-key="bls-16" hidden data-say="Selesai. Ingat tiga langkah: periksa, panggil, tekan. Dewasa dan remaja yang tampak dewasa: tekan lima sampai enam sentimeter, seratus sampai seratus dua puluh per menit. Anak dan bayi: lima napas dulu bila terlatih, tekan sepertiga tebal dada; anak dengan satu tangan, bayi dengan dua ibu jari melingkari dada.">
+<section class="slide" data-key="bls-16" hidden data-say="Selesai. Ingat tiga langkah: periksa, panggil, tekan. Orang dewasa: tekan lima sampai enam sentimeter, seratus sampai seratus dua puluh per menit. Anak dan bayi: lima napas dulu bila terlatih, tekan sepertiga tebal dada; anak dengan satu tangan, bayi dengan dua ibu jari, kedua tangan melingkari dadanya.">
   <p class="eyebrow">Selesai</p>
   <h2>Periksa · Panggil · Tekan</h2>
   <div class="board"></div>
   <div class="box key">
     <h3>Yang diingat</h3>
     <ol class="list">
-      <li>Orang tidak sadar? Langsung panggil bantuan dengan pengeras suara.</li>
+      <li>Orang tidak sadar? Langsung telepon minta bantuan, speaker HP dinyalakan.</li>
       <li>Napas megap-megap atau ragu? Mulai tekan dada.</li>
       <li>Tengah dada, 5–6 cm, 100–120 per menit, dada naik penuh.</li>
       <li>30:2 bila terlatih; kalau tidak, tekan terus.</li>
       <li>Tenggelam: tolong dari darat, 5 napas dulu bila terlatih, jangan keluarkan air. Sudah sadar pun tetap berangkat ke Puskesmas sekarang.</li>
-      <li>Anak dan bayi: 5 napas dulu bila terlatih; tekan sepertiga tebal dada (anak satu tangan, bayi dua ibu jari melingkari dada).</li>
+      <li>Anak dan bayi: 5 napas dulu bila terlatih; tekan sepertiga tebal dada (anak satu tangan; bayi dua ibu jari, kedua tangan melingkari dada).</li>
     </ol>
   </div>
   <p class="box tip"><b>Wajib:</b> latihan dengan manekin dan dinilai bidan atau perawat sebelum dianggap mampu.</p>
@@ -1344,19 +1347,19 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <tr><td>Bulan 7 sampai melahirkan</td><td>3 kali, salah satunya dengan dokter</td></tr>
     </tbody>
   </table></div>
-  <p class="box tip">Banyak keluarga ingin menjaga kehamilan muda tetap tertutup, karena adat atau supaya tenang. Itu dihormati. Ibu tidak perlu bercerita ke orang kampung; cukup periksa ke bidan di ruang tertutup. Kader bicara empat mata dan tidak mengumumkan kehamilannya.</p>
+  <p class="box tip">Banyak keluarga belum ingin kehamilan muda diketahui orang lain, karena adat atau supaya tenang. Itu dihormati. Ibu tidak perlu bercerita ke orang kampung; cukup periksa ke bidan di ruang tertutup. Kader bicara empat mata dan tidak mengumumkan kehamilannya.</p>
   <div class="box quiz" data-id="awal">
     <p class="q">Mama Lina hamil 3 bulan, tetapi belum mau ke Puskesmas karena malu. Apa yang dilakukan kader?</p>
     <div class="opts">
       <button class="opt" data-ok="0" data-fb="Diumumkan di depan orang banyak membuat ibu makin malu dan menjauh.">Umumkan di posyandu supaya dia datang</button>
-      <button class="opt" data-ok="1" data-fb="Benar. Kunjungi secara pribadi, jelaskan manfaatnya, dan tawarkan mengantar.">Kunjungi pribadi, jelaskan manfaat periksa, tawarkan mengantar ke bidan</button>
-      <button class="opt" data-ok="0" data-fb="Kader tidak memeriksa kehamilan. Bidan yang memeriksa.">Periksa sendiri di rumahnya</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Kunjungi secara pribadi, jelaskan manfaatnya, dan tawarkan mengantar.">Temui dia secara pribadi, jelaskan manfaatnya, tawarkan mengantar</button>
+      <button class="opt" data-ok="0" data-fb="Kader tidak memeriksa kehamilan; itu tugas bidan.">Periksa sendiri di rumahnya</button>
     </div>
     <p class="fb" aria-live="polite"></p>
   </div>
 </section>
 
-<section class="slide" data-key="kespro-02" hidden data-say="Posyandu bukan pengganti periksa bidan. Di posyandu kader menimbang dan mengingatkan. Bidan memeriksa tekanan darah, darah, malaria, dan tes HIV, sifilis, hepatitis B.">
+<section class="slide" data-key="kespro-02" hidden data-say="Posyandu bukan pengganti periksa bidan. Di posyandu kader menimbang dan mengingatkan. Bidan mengukur tekanan darah, memeriksa darah untuk melihat kurang darah, dan melakukan tes malaria, HIV, sifilis, serta hepatitis B.">
   <p class="eyebrow">Hamil</p>
   <h2>Posyandu bukan pengganti periksa bidan</h2>
   <p class="lead">Di posyandu, kader menimbang dan mengingatkan. Pemeriksaan kehamilan tetap dilakukan bidan atau dokter.</p>
@@ -1383,8 +1386,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <ol class="list">
       <li>Minum malam hari sebelum tidur.</li>
       <li>Minum dengan air putih atau air jeruk, jangan dengan teh atau kopi.</li>
-      <li>Makan porsi lebih, dengan lauk ikan, telur, atau kacang.</li>
-      <li>Kalau tetap tidak tahan, ceritakan ke bidan. Jangan berhenti diam-diam.</li>
+      <li>Makan dengan porsi lebih banyak, disertai lauk ikan, telur, atau kacang.</li>
+      <li>Kalau tetap tidak tahan dan ingin berhenti, bicarakan dulu dengan bidan.</li>
     </ol>
   </div>
   <div class="box quiz" data-id="ttd">
@@ -1398,7 +1401,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="kespro-04" hidden data-say="Tanda bahaya kehamilan. Perdarahan, kejang, air ketuban keluar sebelum waktunya, sakit kepala hebat, atau pandangan kabur, walau tanpa bengkak: panggil bantuan dan berangkat sekarang. Bayi dalam perut kurang bergerak dibanding biasanya: hubungi bidan sekarang juga; tidak tersambung, berangkat sekarang ke Puskesmas. Demam atau menggigil, muntah terus sampai tidak bisa makan, atau wajah dan tangan tiba-tiba bengkak: ke bidan atau Puskesmas hari ini juga, jangan tunggu besok.">
+<section class="slide" data-key="kespro-04" hidden data-say="Tanda bahaya kehamilan. Perdarahan, kejang, air ketuban keluar sebelum waktunya, sakit kepala hebat, atau pandangan kabur, walaupun tidak bengkak: panggil bantuan dan berangkat sekarang. Bayi dalam perut kurang bergerak dibanding biasanya? Telepon bidan sekarang juga; kalau tidak tersambung, langsung berangkat sekarang ke Puskesmas. Demam atau menggigil, muntah terus sampai tidak bisa makan, atau wajah dan tangan tiba-tiba bengkak: ke bidan atau Puskesmas hari ini juga, jangan tunggu besok.">
   <p class="eyebrow">Hamil</p>
   <h2>Tanda bahaya kehamilan</h2>
   <figure class="ill"><svg aria-describedby="cap-kespro-04" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="Enam contoh tanda bahaya kehamilan: perdarahan, kejang, ketuban keluar, sakit kepala hebat, demam, dan gerak bayi berkurang; baca keterangan di bawah gambar.">
@@ -1414,11 +1417,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 </g>
 <g class="ill-kespro04-fill"><path d="M69 88c0 0-8 10-8 14a8 8 0 0 0 16 0c0-4-8-14-8-14Z"/><path d="M191 177v17a5 5 0 1 0 1 0v-17Z"/></g>
 <g class="ill-kespro04-accent"><path d="m119 38 5-9 5 8m40-5 5-9 5 8m15 35 7-4 1 9M278 89l-3 8m13-7-2 10m-16 4q12 5 26-1M18 151l-6-5m7 15-9 1m10 8-7 6M140 178q7 5 14 0m29-15h4m-60-14-5-7m5 18-7 1"/><path d="M277 181q8 4 7 12m5-15q10 7 9 18" stroke-dasharray="2 7"/><path d="m280 211 14-14m-14 0 14 14"/></g>
-</svg><figcaption id="cap-kespro-04"><ol class="list"><li>Keluar darah dari jalan lahir: <b>berangkat sekarang</b></li><li>Kejang: <b>berangkat sekarang</b></li><li>Air ketuban keluar sebelum waktunya: <b>berangkat sekarang</b></li><li>Sakit kepala hebat atau pandangan kabur, walau tanpa bengkak: <b>berangkat sekarang</b></li><li>Demam atau menggigil: periksa hari ini</li><li>Gerak bayi berkurang: <b>hubungi bidan sekarang</b>; tidak tersambung, berangkat</li></ol><p>Urutan ikon: kiri ke kanan, baris atas lalu bawah. Warna ikon tidak membedakan tingkat kegawatan.</p></figcaption></figure>
+</svg><figcaption id="cap-kespro-04"><ol class="list"><li>Keluar darah dari jalan lahir: <b>berangkat sekarang</b></li><li>Kejang: <b>berangkat sekarang</b></li><li>Air ketuban keluar sebelum waktunya: <b>berangkat sekarang</b></li><li>Sakit kepala hebat atau pandangan kabur, walaupun tidak bengkak: <b>berangkat sekarang</b></li><li>Demam atau menggigil: periksa hari ini</li><li>Gerak bayi berkurang: <b>telepon bidan sekarang</b>; kalau tidak tersambung, langsung berangkat</li></ol><p>Ikon dibaca dari kiri ke kanan, baris atas lalu bawah. Tingkat kegawatannya lihat tulisan, bukan warna ikon.</p></figcaption></figure>
   <div class="box stop"><h3>Berangkat SEKARANG, panggil bantuan</h3>
-    <ol class="list"><li>Keluar darah dari jalan lahir</li><li>Kejang</li><li>Air ketuban keluar sebelum waktunya</li><li>Sakit kepala hebat, atau pandangan kabur, walau tanpa bengkak</li><li>Bayi dalam perut kurang bergerak dibanding biasanya: <b>hubungi bidan sekarang juga</b>. Tidak tersambung? Berangkat sekarang ke Puskesmas.</li></ol></div>
+    <ol class="list"><li>Keluar darah dari jalan lahir</li><li>Kejang</li><li>Air ketuban keluar sebelum waktunya</li><li>Sakit kepala hebat atau pandangan kabur, walaupun tidak bengkak</li><li>Bayi dalam perut kurang bergerak dibanding biasanya: <b>telepon bidan sekarang juga</b>. Kalau tidak tersambung, langsung berangkat ke Puskesmas.</li></ol></div>
   <div class="box key"><h3>Ke bidan HARI INI, jangan tunggu besok</h3>
-    <ol class="list"><li>Demam atau menggigil (bisa malaria)</li><li>Muntah terus dan tidak bisa makan</li><li>Wajah dan tangan tiba-tiba bengkak: ukur tekanan darah</li></ol></div>
+    <ol class="list"><li>Demam atau menggigil (bisa malaria)</li><li>Muntah terus dan tidak bisa makan</li><li>Wajah dan tangan tiba-tiba bengkak (perlu diukur tekanan darahnya)</li></ol></div>
   <div class="box quiz" data-id="bahaya1">
     <p class="q">Demam dan menggigil setiap malam pada bulan ke-7.</p>
     <div class="pair">
@@ -1430,7 +1433,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box quiz" data-id="bahaya2">
     <p class="q">Mual pagi hari pada bulan ke-2, tetapi masih bisa makan dan minum.</p>
     <div class="pair">
-      <button class="opt" data-ok="0" data-fb="Boleh saja bertanya ke bidan, tetapi mual pagi yang masih bisa makan dan minum belum perlu buru-buru. Ceritakan saat periksa berikutnya; ke bidan hari ini bila muntah terus atau tidak bisa makan.">Ke bidan hari ini</button>
+      <button class="opt" data-ok="0" data-fb="Boleh saja bertanya ke bidan, tetapi kalau hanya mual pagi dan ibu masih bisa makan dan minum, belum perlu buru-buru. Ceritakan saat periksa berikutnya; ke bidan hari ini bila muntah terus atau tidak bisa makan.">Ke bidan hari ini</button>
       <button class="opt" data-ok="1" data-fb="Benar. Ceritakan saat periksa. Kalau muntah terus dan tidak bisa makan, segera ke bidan.">Ceritakan saat periksa berikutnya</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -1448,7 +1451,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <section class="slide" data-key="kespro-05" hidden data-say="Rencana persalinan. Sebelum waktunya tiba, sepakati siapa penolong, di mana melahirkan, siapa pendamping, kendaraan dan sopirnya, calon donor darah, dan biaya atau kartu JKN. Tulis di stiker rencana persalinan. Ibu dan keluarga yang menentukan apa yang ditulis dan di mana stiker ditempel.">
   <p class="eyebrow">Menjelang melahirkan</p>
   <h2>Susun rencana persalinan</h2>
-  <p class="lead">Rencana disepakati jauh sebelum waktunya dan ditulis di stiker rencana persalinan (P4K). Bicarakan berdua dengan ibu: ibu dan keluarga yang menentukan isi stiker dan tempat menempelnya.</p>
+  <p class="lead">Rencana disepakati jauh sebelum waktunya dan ditulis di stiker rencana persalinan (P4K). Bicarakan dulu berdua dengan ibu. Ibu dan keluarganya yang menentukan apa yang ditulis dan di mana stiker ditempel.</p>
   <figure class="ill"><svg aria-describedby="cap-kespro-05" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Lima bagian rencana persalinan: penolong terampil, fasilitas kesehatan, pendamping, kendaraan dan sopir, serta calon donor darah. Biaya atau JKN tetap disiapkan bersama keluarga dan bidan.">
 <style>.ill-kespro05-line{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.ill-kespro05-soft{fill:var(--pulse-soft,#FBE5E8);stroke:none}.ill-kespro05-accent{fill:none;stroke:var(--pulse,#C3122D);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.ill-kespro05-fill{fill:var(--pulse,#C3122D);stroke:none}</style>
 <g class="ill-kespro05-soft"><rect x="5" y="6" width="96" height="88" rx="13"/><rect x="112" y="6" width="96" height="88" rx="13"/><rect x="219" y="6" width="96" height="88" rx="13"/><rect x="58" y="105" width="96" height="88" rx="13"/><rect x="166" y="105" width="96" height="88" rx="13"/></g>
@@ -1459,8 +1462,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <path d="m180 169 11-13 13 3 18-6c7-2 10 4 4 8l-14 7h13l17-11c6-4 11 2 6 7l-22 17h-28l-8 7"/></g>
 <g class="ill-kespro05-accent"><path d="m35 84 10 0m95 0h39m69 0h36m-54 91h-22"/></g>
 <path class="ill-kespro05-fill" d="M217 116c0 0-11 14-11 21a11 11 0 0 0 22 0c0-7-11-21-11-21Z"/>
-</svg><figcaption id="cap-kespro-05">Sepakati penolong, tempat, pendamping, transportasi, dan calon donor. Tulis juga biaya atau JKN pada rencana keluarga.</figcaption></figure>
-  <div class="box pick" data-id="p4k" data-ok-fb="Benar, lengkap. Rencana ini yang menyelamatkan ibu saat malam atau hujan.">
+</svg><figcaption id="cap-kespro-05">Sepakati penolong, tempat, pendamping, transportasi, dan calon donor. Biaya atau kartu JKN juga dicatat dalam rencana keluarga.</figcaption></figure>
+  <div class="box pick" data-id="p4k" data-ok-fb="Benar, lengkap. Rencana ini membantu keluarga bertindak cepat, juga saat malam atau hujan.">
     <p class="q">Ketuk semua yang termasuk rencana persalinan, lalu periksa.</p>
     <div class="opts">
       <button class="opt" data-ok="1" data-need="1" data-label="penolong">Siapa penolong (bidan atau dokter)</button>
@@ -1475,7 +1478,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <div class="row"><button class="btn pick-check">Periksa pilihan</button></div>
     <p class="fb" aria-live="polite"></p>
   </div>
-  <p class="box tip">Rumah jauh dari Puskesmas? Bicarakan dengan bidan untuk tinggal lebih dekat menjelang hari lahir.</p>
+  <p class="box tip">Rumah jauh dari Puskesmas? Bicarakan dengan bidan kemungkinan ibu tinggal sementara lebih dekat ke Puskesmas menjelang persalinan.</p>
 </section>
 
 <section class="slide" data-key="kespro-06" hidden data-say="Bersalin dengan bidan. Pendamping keluarga, adat menyambut bayi, dan cara merawat ari-ari bisa dibicarakan dengan bidan sejak awal. Kader tidak menolong persalinan. Tanda bahaya saat melahirkan: perdarahan, air ketuban hijau atau berbau, kejang, tali pusat atau tangan bayi keluar lebih dulu, ibu lemas tidak kuat mengejan, atau mulas lama tetapi bayi belum lahir: panggil bantuan dan berangkat sekarang. Keluarga boleh berdoa dan berembuk, tetapi sambil berangkat.">
@@ -1497,7 +1500,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="box tip">Saat ibu berdarah banyak atau kejang, keluarga pasti takut dan memikirkan banyak hal. Berdoa dan berembuk bisa dilakukan sambil berangkat. Perdarahan dan kejang tidak bisa menunggu.</p>
 </section>
 
-<section class="slide" data-key="kespro-07" hidden data-say="Bayi baru lahir. Hangatkan di dada ibu, susui dalam satu jam pertama, jaga tali pusat bersih dan kering tanpa diberi apa pun. Bayi tidak mau menyusu, kejang, lemas, sesak atau bibir biru, napas cepat atau merintih, demam atau badan teraba dingin, atau kuning di hari pertama atau kuning sampai telapak tangan dan kaki: berangkat sekarang. Kuning yang muncul di hari kedua atau sesudahnya dan telapaknya belum kuning, atau tali pusat merah, bernanah, atau berbau: ke bidan hari ini juga. Ada satu saja tanda untuk berangkat sekarang? Berangkat sekarang, walau tanda lain lebih ringan.">
+<section class="slide" data-key="kespro-07" hidden data-say="Bayi baru lahir. Hangatkan di dada ibu, susui dalam satu jam pertama, jaga tali pusat bersih dan kering tanpa diberi apa pun. Tali pusat dipotong bidan dengan alat steril; silet atau pisau yang tidak steril bisa menyebabkan tetanus. Bayi tidak mau menyusu, kejang, lemas, sesak atau bibir biru, napas cepat atau merintih, demam atau badan teraba dingin, atau kuning di hari pertama atau kuning sampai telapak tangan dan kaki: berangkat sekarang. Bayi kuning mulai hari kedua atau sesudahnya, tetapi telapak tangan dan kakinya belum kuning: ke bidan hari ini juga. Tali pusat merah, bernanah, atau berbau: juga ke bidan hari ini. Cukup satu tanda gawat untuk langsung berangkat sekarang.">
   <p class="eyebrow">Bayi baru lahir</p>
   <h2>Hangat, menyusu, tali pusat kering</h2>
   <figure class="ill"><svg aria-describedby="cap-kespro-07" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="Dada dan perut bayi menempel langsung pada dada ibu; punggung bayi menghadap pengamat dan kepala menoleh ke samping. Wajah terbuka, hidung dan mulut bebas dari selimut. Lingkaran kanan memperlihatkan tali pusat di atas lipatan popok.">
@@ -1512,7 +1515,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <g class="ill-kespro07-accent"><path d="M154 81c7-4 12 4 19 0m-17 12c7-4 12 4 19 0"/><path d="m187 130 28 8" stroke-dasharray="4 7"/></g>
 <circle class="ill-kespro07-soft" cx="264" cy="158" r="45"/>
 <g class="ill-kespro07-line"><path d="M241 131c-6 12-7 28-5 42m51-42c6 12 7 28 5 42M238 175q26 11 51 0m-48 7q23 7 45 0"/><path d="M260 161c-7-1-9-8-5-12l5-5 5 4-3 6 7 1c3 5-2 9-9 6Z"/><path d="m258 149 5 4"/></g>
-</svg><figcaption id="cap-kespro-07">Dada dan perut bayi bersentuhan langsung dengan dada ibu; wajah dan jalan napas terlihat. Inset: tali pusat bersih dan kering.</figcaption></figure>
+</svg><figcaption id="cap-kespro-07">Dada dan perut bayi bersentuhan langsung dengan dada ibu; wajah dan jalan napas terlihat. Lingkaran kecil: tali pusat bersih dan kering.</figcaption></figure>
   <div class="grid2">
     <div class="box"><h3>Rawat</h3>
       <ol class="list">
@@ -1525,8 +1528,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <p><b>Berangkat sekarang:</b></p>
       <ol class="list"><li>Tidak mau menyusu</li><li>Kejang</li><li>Lemas, tidak bergerak</li><li>Sesak, bibir biru</li><li>Napas cepat atau merintih</li><li>Demam, atau badan teraba dingin</li><li>Kuning di hari pertama, atau kuning sampai telapak tangan dan kaki</li></ol>
       <p><b>Ke bidan hari ini:</b></p>
-      <ol class="list"><li>Kuning yang muncul di hari kedua atau sesudahnya, telapak belum kuning</li><li>Tali pusat merah, bernanah, atau berbau</li></ol>
-      <p class="muted">Ada satu saja tanda di daftar berangkat sekarang? Berangkat sekarang, walau tanda lain lebih ringan.</p></div>
+      <ol class="list"><li>Kuning mulai hari kedua atau sesudahnya, tetapi telapak tangan dan kaki belum kuning</li><li>Tali pusat merah, bernanah, atau berbau</li></ol>
+      <p class="muted">Cukup satu tanda dari daftar "Berangkat sekarang" untuk langsung berangkat.</p></div>
   </div>
   <div class="box quiz" data-id="bayi">
     <p class="q">Bayi umur 2 hari tampak kuning dan malas menyusu.</p>
@@ -1538,7 +1541,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="kespro-08" hidden data-say="Masa nifas. Ibu dan bayi diperiksa bidan dalam dua hari pertama, lalu beberapa kali lagi sampai enam minggu. Melahirkan di rumah? Hubungi bidan hari itu juga, supaya ibu dan bayi diperiksa dalam dua puluh empat jam pertama. Perdarahan banyak dari jalan lahir, kejang, sakit kepala hebat, atau pandangan kabur, walau tanpa bengkak: panggil bantuan dan berangkat sekarang. Cairan dari jalan lahir berbau, demam atau menggigil, yang di Momiwaren diperiksa malaria hari itu, wajah dan tangan tiba-tiba bengkak, payudara merah, bengkak, dan nyeri, atau sedih terus sampai tidak mau makan atau mengurus bayi: ke bidan hari ini juga.">
+<section class="slide" data-key="kespro-08" hidden data-say="Masa nifas. Ibu dan bayi diperiksa bidan dalam dua hari pertama, lalu beberapa kali lagi sampai enam minggu. Melahirkan di rumah? Hubungi bidan hari itu juga, supaya ibu dan bayi diperiksa dalam dua puluh empat jam pertama. Perdarahan banyak dari jalan lahir, kejang, sakit kepala hebat, atau pandangan kabur, walaupun tidak bengkak: panggil bantuan dan berangkat sekarang. Ke bidan hari ini juga bila cairan dari jalan lahir berbau, ibu demam atau menggigil, wajah dan tangan tiba-tiba bengkak, payudara merah, bengkak, dan nyeri, atau ibu sedih terus sampai tidak mau makan atau mengurus bayi. Di Momiwaren, ibu yang demam atau menggigil diperiksa malaria hari itu juga.">
   <p class="eyebrow">Setelah melahirkan</p>
   <h2>Masa nifas: 6 minggu yang rawan</h2>
   <p class="lead">Ibu dan bayi diperiksa bidan <b>dalam 2 hari pertama</b>, lalu beberapa kali lagi sampai 6 minggu.</p>
@@ -1548,15 +1551,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <ol class="list">
       <li>Perdarahan banyak dari jalan lahir</li>
       <li>Kejang</li>
-      <li>Sakit kepala hebat, atau pandangan kabur, walau tanpa bengkak</li>
+      <li>Sakit kepala hebat atau pandangan kabur, walaupun tidak bengkak</li>
     </ol>
   </div>
   <div class="box key">
     <h3>Ke bidan HARI INI, jangan tunggu besok</h3>
     <ol class="list">
       <li>Cairan dari jalan lahir berbau</li>
-      <li>Demam atau menggigil; di Momiwaren periksa malaria hari itu</li>
-      <li>Wajah dan tangan tiba-tiba bengkak: ukur tekanan darah</li>
+      <li>Demam atau menggigil (di Momiwaren, periksa malaria hari itu juga)</li>
+      <li>Wajah dan tangan tiba-tiba bengkak (perlu diukur tekanan darahnya)</li>
       <li>Payudara merah, bengkak, dan nyeri</li>
       <li>Sedih terus sampai tidak mau makan atau mengurus bayi</li>
     </ol>
@@ -1614,7 +1617,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box tes" data-id="tes-akhir" data-phase="post"></div>
 </section>
 
-<section class="slide" data-key="kespro-11" hidden data-say="Selesai. Ingat: periksa hamil ke bidan sejak awal, minimal enam kali. Minum tablet tambah darah setiap hari. Susun rencana persalinan. Bersalin ditolong bidan. Perdarahan, kejang, ketuban pecah sebelum waktunya, sakit kepala hebat, atau pandangan kabur: berangkat sekarang. Gerak janin berkurang: hubungi bidan sekarang; tidak tersambung, berangkat. Bayi di bawah dua bulan yang tidak mau menyusu, lemas, kejang, napas cepat atau merintih, demam, atau badan dingin: berangkat sekarang. Demam atau muntah terus pada ibu hamil: periksa hari itu juga.">
+<section class="slide" data-key="kespro-11" hidden data-say="Selesai. Ingat: periksa hamil ke bidan sejak awal, minimal enam kali. Minum tablet tambah darah setiap hari. Susun rencana persalinan. Bersalin ditolong bidan. Perdarahan, kejang, ketuban pecah sebelum waktunya, sakit kepala hebat, atau pandangan kabur: berangkat sekarang. Gerak janin berkurang: hubungi bidan sekarang; kalau tidak tersambung, langsung berangkat. Bayi di bawah dua bulan yang tidak mau menyusu, lemas, kejang, napas cepat atau merintih, demam, atau badan dingin: berangkat sekarang. Demam atau muntah terus pada ibu hamil: periksa hari itu juga.">
   <p class="eyebrow">Selesai</p>
   <h2>Ibu selamat, bayi selamat</h2>
   <div class="board"></div>
@@ -1624,7 +1627,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Tahu hamil? Ke bidan sejak awal, minimal 6 kali periksa.</li>
       <li>Tablet tambah darah setiap hari, minimal 90 tablet.</li>
       <li>Rencana persalinan disusun bersama keluarga; ibu menentukan isi stiker dan tempat menempelnya.</li>
-      <li>Bersalin ditolong bidan. Perdarahan, kejang, ketuban pecah sebelum waktunya, sakit kepala hebat, atau pandangan kabur: berangkat sekarang. Gerak janin berkurang: hubungi bidan sekarang; tidak tersambung, berangkat. Demam atau muntah terus: periksa hari itu juga.</li>
+      <li>Bersalin ditolong bidan. Perdarahan, kejang, ketuban pecah sebelum waktunya, sakit kepala hebat, atau pandangan kabur: berangkat sekarang. Gerak janin berkurang: hubungi bidan sekarang; kalau tidak tersambung, langsung berangkat. Demam atau muntah terus: periksa hari itu juga.</li>
       <li>Bayi di bawah 2 bulan tidak mau menyusu, lemas, kejang, napas cepat atau merintih, demam, atau badan dingin: berangkat sekarang.</li>
       <li>Bayi: hangat, menyusu, tali pusat kering tanpa diberi apa pun.</li>
     </ol>
@@ -1637,11 +1640,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
 <div class="deck" data-mod="kulit" data-cover="img/bermain-saga.webp" data-pos="center 45%" data-credit="Tempat bermain anak, Kampung Saga, Metemani · Lefaan · CC BY-SA 4.0" data-n="3" data-title="Kesehatan Kulit" data-desc="Mengenali kusta, kaskado, kudis, dan frambusia, lalu mengajak periksa tanpa menghakimi." hidden>
 
-<section class="slide" data-key="kulit-00" data-say="Kesehatan Kulit. Banyak penyakit kulit di kampung bisa sembuh dengan obat dari Puskesmas. Tugas kader: mengenali, mengajak periksa, dan menjaga rahasia. Kader tidak memberi nama penyakit atau obat.">
+<section class="slide" data-key="kulit-00" data-say="Kesehatan Kulit. Banyak penyakit kulit di kampung bisa sembuh dengan obat dari Puskesmas. Tugas kader: mengenali, mengajak periksa, dan menjaga rahasia. Kader tidak menetapkan nama penyakit dan tidak memberi obat.">
   <p class="eyebrow">Modul 3 dari 5</p>
   <h2>Kesehatan Kulit</h2>
   <p class="lead">Banyak penyakit kulit di kampung bisa sembuh dengan obat dari Puskesmas. Tugas kader: <b>mengenali, mengajak periksa, dan menjaga rahasia.</b></p>
-  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Mengenali bercak mati rasa, kaskado, kudis, dan frambusia sebagai alasan mengajak periksa.</li><li>Berbicara empat mata dan menjaga rahasia.</li><li>Tidak menguji bercak dan tidak menebak nama penyakit.</li></ol></div>
+  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Mengenali bercak mati rasa, kaskado, kudis, dan frambusia, lalu mengajak periksa.</li><li>Berbicara empat mata dan menjaga rahasia.</li><li>Mengajak periksa tanpa menguji bercak atau menebak nama penyakit.</li></ol></div>
   <div class="box tip">
     <p>Kader tidak menetapkan nama penyakit dan tidak memberi obat. Yang memeriksa adalah perawat, bidan, atau dokter Puskesmas.</p>
   </div>
@@ -1661,10 +1664,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="figure">
     <svg viewBox="0 0 260 180" role="img" aria-label="Bercak pada kulit yang terasa tebal atau mati rasa, biasanya tidak gatal">
       <rect x="10" y="10" width="240" height="160" rx="18" class="fig-fill fig-ink" stroke-width="2"/>
-      <ellipse cx="120" cy="92" rx="62" ry="44" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 5"/>
-      <text class="fig-text" x="78" y="90">bercak</text>
-      <text class="fig-muted" x="78" y="108">biasanya tidak gatal</text>
-      <text class="fig-text" x="128" y="160">terasa tebal, mati rasa</text>
+      <ellipse cx="130" cy="88" rx="84" ry="46" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 5"/>
+      <text class="fig-text" x="130" y="84" text-anchor="middle">bercak</text>
+      <text class="fig-muted" x="130" y="102" text-anchor="middle">biasanya tidak gatal</text>
+      <text class="fig-text" x="130" y="156" text-anchor="middle">terasa tebal, mati rasa</text>
     </svg>
     <ol class="list">
       <li>Bercak putih atau kemerahan yang <b>mati rasa</b></li>
@@ -1674,13 +1677,13 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Luka di telapak yang tidak terasa</li>
     </ol>
   </div>
-  <p class="box key">Ajak periksa ke Puskesmas <b>hari itu juga</b>, jangan ditunda. <b>Obat kusta gratis</b> dan diminum <b>6 sampai 12 bulan</b> sampai tuntas, sesuai petunjuk petugas. Ditemukan lebih awal berarti cacat bisa dicegah.</p>
+  <p class="box key">Ajak periksa ke Puskesmas <b>hari itu juga</b>, jangan ditunda. <b>Obat kusta gratis</b> dan diminum <b>6 sampai 12 bulan</b> sampai tuntas, sesuai petunjuk petugas. Makin cepat ditemukan, makin besar peluang mencegah cacat.</p>
   <div class="klinis">
     <figure class="photo"><img src="img/kusta-1.webp" width="700" height="460" alt="Foto: bercak lebih pucat yang luas dengan bintil kecil kemerahan pada kulit gelap." loading="lazy"><figcaption><b>Bercak pucat yang luas pada kulit gelap.</b> CDC/Arthur E. Kayne, PHIL 19225, domain publik. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
     <figure class="photo"><img src="img/kusta-2.webp" width="700" height="460" alt="Foto: bercak lebih terang di punggung tangan berkulit gelap." loading="lazy"><figcaption><b>Bercak lebih terang di punggung tangan.</b> CDC/Andre J. Lebrun, PHIL 15501, domain publik. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
   </div>
-  <p class="muted batas-foto">Foto membantu mengenali tanda. Mati rasa tidak terlihat di foto: tanyakan apakah bercak terasa kebal. Bercak yang mirip belum tentu kusta; kepastiannya oleh petugas Puskesmas.</p>
-  <p class="box tip">Kader <b>tidak</b> menguji bercak dengan kapas, jarum, atau tangan, dan tidak menebak nama penyakitnya. Cukup tanyakan dengan sopan, lalu ajak periksa. Petugas Puskesmas yang memeriksa.</p>
+  <p class="muted batas-foto">Foto membantu mengenali tanda. Mati rasa tidak terlihat di foto: tanyakan apakah bercak terasa kebal. Bercak yang mirip belum tentu kusta; yang bisa memastikan hanya petugas Puskesmas.</p>
+  <p class="box tip">Kader <b>tidak</b> menguji bercak dengan kapas, jarum, atau tangan, dan tidak menebak nama penyakitnya. Cukup tanyakan dengan sopan, lalu ajak periksa ke Puskesmas.</p>
 </section>
 
 <section class="slide" data-key="kulit-02" hidden data-say="Mitos atau fakta tentang kusta. Pilih jawabanmu untuk setiap kalimat.">
@@ -1711,9 +1714,9 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="fb" aria-live="polite"></p>
   </div>
   <div class="box quiz" data-id="mitos4">
-    <p class="q">Kusta yang ditemukan dan diobati sejak awal sangat mengurangi risiko cacat.</p>
+    <p class="q">Bila kusta ditemukan dan diobati sejak awal, risiko cacat sangat berkurang.</p>
     <div class="pair">
-      <button class="opt" data-ok="1" data-fb="Benar. Pengobatan dini sangat mengurangi risiko kerusakan saraf. Selama berobat, rasa dan tenaga tangan-kaki tetap diperiksa petugas.">Fakta</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Pengobatan dini sangat mengurangi risiko kerusakan saraf. Selama berobat, petugas tetap memeriksa rasa raba dan kekuatan tangan serta kaki.">Fakta</button>
       <button class="opt" data-ok="0" data-fb="Ini fakta. Karena itu, bercak mati rasa perlu segera diperiksa.">Mitos</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -1728,7 +1731,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <li>Bicara empat mata, di tempat yang tenang.</li>
     <li>Jangan sebut nama penyakit di depan orang banyak.</li>
     <li>Tawarkan menemani ke Puskesmas.</li>
-    <li>Keluarga serumah juga diajak diperiksa; Puskesmas yang mengatur.</li>
+    <li>Keluarga serumah juga diajak diperiksa; jadwalnya diatur Puskesmas.</li>
     <li>Penderita tetap boleh bekerja, sekolah, dan ikut ibadah.</li>
     <li>Jangan menyebut nama atau menunjuk orang yang punya bercak di posyandu, ibadah, atau pertemuan kampung.</li>
   </ol>
@@ -1757,7 +1760,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <figure class="photo"><img src="img/kaskado-1.webp" width="700" height="469" alt="Foto: sisik berlapis membentuk lingkaran-lingkaran seperti ukiran di punggung dan bahu seorang anak." loading="lazy"><figcaption><b>Sisik berlapis melingkar seperti ukiran,</b> di punggung anak, Papua Nugini. CDC/K. Mae Lennon dan Clement Benjamin, PHIL 12177, domain publik. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
     <figure class="photo"><img src="img/kaskado-2.webp" width="636" height="800" alt="Foto: sisik melingkar halus menutupi punggung dan bahu orang dewasa." loading="lazy"><figcaption><b>Sisik melingkar menutupi punggung dan bahu</b> orang dewasa, Sumba. Ayuni dkk. 2025, Int J Dermatol, CC BY 4.0, dipotong. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
   </div>
-  <p class="muted batas-foto">Foto membantu mengenali tanda. Kurap biasa bisa tampak mirip; kepastiannya oleh petugas Puskesmas.</p>
+  <p class="muted batas-foto">Foto membantu mengenali tanda. Kurap biasa bisa tampak mirip; yang bisa memastikan hanya petugas Puskesmas.</p>
 </section>
 
 <section class="slide" data-key="kulit-05" hidden data-say="Kudis. Gatal hebat terutama malam hari, bintil kecil di sela jari, pergelangan tangan, ketiak, pinggang, dan kelamin. Satu rumah sering ikut gatal. Lihat foto bintil di sela jari dan gambar tempat-tempat yang sering kena. Obat dari Puskesmas dipakai seluruh keluarga bersamaan; cuci dan jemur pakaian, sprei, dan tikar.">
@@ -1780,17 +1783,17 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <path d="M186 70Q206 76 210 98L218 150" fill="none" stroke-width="15"/><path d="M186 70Q206 76 210 98L218 150" fill="none" stroke="var(--bg,#F3F5F8)" stroke-width="9"/>
 <ellipse cx="100" cy="166" rx="9" ry="13"/><ellipse cx="220" cy="166" rx="9" ry="13"/>
 </g>
-<g fill="var(--pulse,#C3122D)"><circle cx="137" cy="82" r="5"/><circle cx="183" cy="82" r="5"/><circle cx="135" cy="136" r="5"/><circle cx="185" cy="136" r="5"/><circle cx="103" cy="152" r="5"/><circle cx="217" cy="152" r="5"/><circle cx="99" cy="172" r="4.5"/><circle cx="221" cy="172" r="4.5"/></g>
+<g fill="var(--sos,#B3102A)"><circle cx="137" cy="82" r="5"/><circle cx="183" cy="82" r="5"/><circle cx="135" cy="136" r="5"/><circle cx="185" cy="136" r="5"/><circle cx="103" cy="152" r="5"/><circle cx="217" cy="152" r="5"/><circle cx="99" cy="172" r="4.5"/><circle cx="221" cy="172" r="4.5"/></g>
 </svg><figcaption id="cap-kulit-05">Titik merah, dari atas ke bawah: <b>ketiak, pinggang, pergelangan tangan, sela jari</b>. Bintil juga sering di sekitar kelamin; cukup ditanyakan, jangan meminta warga membuka pakaian.</figcaption></figure>
   </div>
-  <p class="muted batas-foto">Foto membantu mengenali tanda. Tanyakan juga: gatal terutama malam? Orang serumah ikut gatal? Kepastiannya oleh petugas Puskesmas.</p>
+  <p class="muted batas-foto">Foto membantu mengenali tanda. Tanyakan juga: gatal terutama malam? Orang serumah ikut gatal? Yang bisa memastikan hanya petugas Puskesmas.</p>
 </section>
 
-<section class="slide" data-key="kulit-06" hidden data-say="Frambusia. Benjolan atau luka di kulit, kadang seperti buah arbei, sering pada anak, di kaki atau tangan, biasanya tidak sakit. Contoh foto: benjolan berkerak kuning di tungkai, dan luka berkerak di siku. Luka anak yang tidak sembuh-sembuh tetap diperiksa walau tidak mirip foto. Menular lewat sentuhan dengan luka. Bisa disembuhkan dengan obat dari Puskesmas; anak-anak serumah dan teman bermain juga perlu diperiksa.">
+<section class="slide" data-key="kulit-06" hidden data-say="Frambusia. Benjolan atau luka di kulit, kadang berbintil seperti buah arbei atau stroberi, sering pada anak, di kaki atau tangan, biasanya tidak sakit. Contoh foto: benjolan berkerak kuning di tungkai, dan luka berkerak di siku. Luka anak yang tidak sembuh-sembuh tetap diperiksa walau tidak mirip foto. Menular lewat sentuhan dengan luka. Bisa disembuhkan dengan obat dari Puskesmas; anak-anak serumah dan teman bermain juga perlu diperiksa.">
   <p class="eyebrow">Frambusia</p>
   <h2>Frambusia: benjolan atau luka yang tak kunjung sembuh</h2>
   <ol class="list">
-    <li>Benjolan atau luka di kulit, kadang seperti buah arbei</li>
+    <li>Benjolan atau luka di kulit, kadang berbintil seperti buah arbei (stroberi)</li>
     <li>Sering pada anak, di kaki atau tangan, biasanya tidak sakit</li>
     <li>Menular lewat sentuhan dengan luka</li>
   </ol>
@@ -1802,7 +1805,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="muted batas-foto">Foto membantu mengenali tanda. Luka anak yang tidak sembuh-sembuh tetap diperiksa walau tidak mirip foto ini.</p>
 </section>
 
-<section class="slide" data-key="kulit-07" hidden data-say="Rawat di rumah atau ke Puskesmas? Pilih untuk setiap keadaan. Lalu latihan dengan foto: bercak yang terasa kebal, sisik di tungkai yang ingin berhenti diobati, dan bercak di kaki anak yang tidak mirip buah arbei.">
+<section class="slide" data-key="kulit-07" hidden data-say="Rawat di rumah atau ke Puskesmas? Pilih untuk setiap keadaan. Lalu latihan dengan foto: bercak yang terasa kebal, Bapa dengan sisik di tungkai yang ingin berhenti minum obat, dan bercak di kaki anak yang tidak mirip buah arbei.">
   <p class="eyebrow">Latihan</p>
   <h2>Rawat di rumah atau ke Puskesmas?</h2>
   <div class="box quiz" data-id="kasus1">
@@ -1814,7 +1817,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="fb" aria-live="polite"></p>
   </div>
   <div class="box quiz" data-id="kasus2">
-    <p class="q">Bercak putih di lengan, tidak gatal. Pemiliknya bilang bercak itu tidak terasa.</p>
+    <p class="q">Seorang warga punya bercak putih di lengan, tidak gatal. Ia bilang bercak itu tidak terasa.</p>
     <div class="pair">
       <button class="opt" data-ok="0" data-fb="Bercak yang tidak terasa perlu diperiksa petugas Puskesmas.">Rawat di rumah</button>
       <button class="opt" data-ok="1" data-fb="Benar. Bicara empat mata dan ajak periksa ke Puskesmas.">Ke Puskesmas</button>
@@ -1830,7 +1833,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="fb" aria-live="polite"></p>
   </div>
   <div class="box quiz" data-id="kasus4">
-    <p class="q">Luka gores kecil di kaki, bersih, tidak dalam, tidak bengkak, tidak demam.</p>
+    <p class="q">Luka gores kecil di kaki: bersih, tidak dalam, tidak bengkak, tidak demam. Mana yang biasanya cukup?</p>
     <div class="pair">
       <button class="opt" data-ok="1" data-fb="Benar. Cuci dengan air bersih dan sabun, tutup, lalu awasi. Kalau bengkak, merah meluas, bernanah, atau demam, ke Puskesmas.">Rawat di rumah</button>
       <button class="opt" data-ok="0" data-fb="Boleh diperiksakan, tetapi luka gores kecil yang bersih biasanya cukup dirawat di rumah sambil diawasi. Ke Puskesmas bila bengkak, merah meluas, bernanah, demam, atau luka akibat gigitan atau tusukan dalam.">Ke Puskesmas</button>
@@ -1840,11 +1843,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <h3>Latihan dengan foto</h3>
   <div class="box quiz" data-id="foto1">
     <figure class="photo"><img src="img/kusta-3.webp" width="700" height="670" alt="Foto: bercak pucat bulat di lengan atas." loading="lazy"><figcaption>CDC, PHIL 26964, domain publik, dipotong. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
-    <p class="q">Bercak seperti di foto ini sudah beberapa bulan. Pemiliknya bilang bercak itu terasa kebal. Apa langkah kader?</p>
+    <p class="q">Seorang warga punya bercak seperti di foto ini sejak beberapa bulan. Ia bilang bercak itu terasa kebal. Apa langkah kader?</p>
     <div class="opts">
       <button class="opt" data-ok="1" data-fb="Benar. Bercak yang terasa kebal perlu diperiksa. Bicara empat mata, tanpa menyebut nama penyakit, lalu ajak ke Puskesmas.">Bicara empat mata dan ajak periksa ke Puskesmas</button>
-      <button class="opt" data-ok="0" data-fb="Kader tidak menguji bercak dengan jarum. Petugas Puskesmas yang memeriksa.">Tusuk bercaknya dengan jarum supaya tahu pasti</button>
-      <button class="opt" data-ok="0" data-fb="Menunggu membuat pemeriksaan terlambat. Bercak yang kebal diajak periksa hari itu juga, bukan diobati sendiri.">Sarankan salep dari warung dan tunggu sebulan</button>
+      <button class="opt" data-ok="0" data-fb="Kader tidak menguji bercak dengan jarum; pemeriksaan dilakukan petugas Puskesmas.">Tusuk bercaknya dengan jarum supaya tahu pasti</button>
+      <button class="opt" data-ok="0" data-fb="Menunggu membuat pemeriksaan terlambat. Orang dengan bercak yang terasa kebal diajak periksa hari itu juga, bukan mengobatinya sendiri.">Sarankan salep dari warung dan tunggu sebulan</button>
     </div>
     <p class="fb" aria-live="polite"></p>
   </div>
@@ -1854,15 +1857,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <div class="opts">
       <button class="opt" data-ok="1" data-fb="Benar. Jamur bisa kembali bila obat dihentikan terlalu cepat. Lanjutkan sesuai petunjuk petugas.">Lanjutkan obat sampai habis sesuai petunjuk</button>
       <button class="opt" data-ok="0" data-fb="Gatal yang berkurang belum berarti jamurnya mati. Lanjutkan sampai tuntas.">Berhenti saja karena gatalnya sudah berkurang</button>
-      <button class="opt" data-ok="0" data-fb="Obat harus dari pemeriksaan petugas, bukan dipinjam dari orang lain.">Ganti dengan obat kulit milik tetangganya</button>
+      <button class="opt" data-ok="0" data-fb="Obat diberikan petugas setelah memeriksa, bukan dipinjam dari orang lain.">Ganti dengan obat kulit milik tetangganya</button>
     </div>
     <p class="fb" aria-live="polite"></p>
   </div>
   <div class="box quiz" data-id="foto3">
     <figure class="photo"><img src="img/frambusia-3.webp" width="644" height="800" alt="Foto: bercak pucat bersisik di punggung kedua kaki anak." loading="lazy"><figcaption>Dofitas dkk. 2020, CC BY 4.0. <a href="sumber-foto.html">Sumber</a></figcaption></figure>
-    <p class="q">Kaki anak seperti di foto ini sudah lama bercak bersisik dan tidak sakit. Bentuknya tidak seperti buah arbei. Apa yang dilakukan?</p>
+    <p class="q">Sudah lama ada bercak bersisik di kaki anak ini, seperti di foto. Bercaknya tidak sakit. Bentuknya tidak seperti buah arbei. Apa yang dilakukan?</p>
     <div class="opts">
-      <button class="opt" data-ok="1" data-fb="Benar. Bercak atau luka yang menetap pada anak diperiksa walau tidak mirip gambar mana pun. Petugas yang memastikan.">Ajak periksa ke Puskesmas walau tidak mirip</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Bercak atau luka yang menetap pada anak diperiksa walau tidak mirip gambar mana pun. Biar petugas Puskesmas yang memastikan.">Ajak periksa ke Puskesmas walau tidak mirip</button>
       <button class="opt" data-ok="0" data-fb="Frambusia tidak selalu berbentuk seperti buah arbei. Jangan menunggu.">Tunggu sampai bentuknya seperti buah arbei</button>
       <button class="opt" data-ok="0" data-fb="Minyak tanah bisa melukai kulit dan tidak menyembuhkan.">Olesi minyak tanah supaya sisiknya hilang</button>
     </div>
@@ -1870,7 +1873,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="kulit-08" hidden data-say="Tanda bahaya kulit. Kulit melepuh atau mengelupas luas, apalagi di mulut atau mata atau setelah minum obat baru, atau ruam dengan demam pada anak yang sangat lemas atau sulit dibangunkan: panggil bantuan dan berangkat sekarang. Luka bengkak, merah meluas, bernanah, atau disertai demam; ruam disertai demam tinggi; atau bercak mati rasa disertai tangan atau kaki lemah: ke Puskesmas hari ini juga.">
+<section class="slide" data-key="kulit-08" hidden data-say="Tanda bahaya kulit. Panggil bantuan dan berangkat sekarang bila kulit melepuh atau mengelupas luas, terutama di mulut atau mata, atau setelah minum obat baru. Berangkat sekarang juga bila anak ruam dan demam, dan anak itu sangat lemas atau sulit dibangunkan. Luka bengkak, merah meluas, bernanah, atau disertai demam; ruam disertai demam tinggi; atau bercak mati rasa disertai tangan atau kaki lemah: ke Puskesmas hari ini juga.">
   <p class="eyebrow">Tanda bahaya</p>
   <h2>Kapan harus segera ke Puskesmas?</h2>
   <div class="box stop"><h3>Berangkat SEKARANG, panggil bantuan</h3>
@@ -1893,7 +1896,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <h2>Adik Markus dan teman sekelasnya</h2>
   <div class="box story" data-id="cerita">
 <script type="application/json">
-{"end":"Adik Markus sembuh dan kembali bermain dengan teman-temannya. Kakaknya juga diobati, sehingga kaskado tidak berpindah lagi di rumah. Ibu guru dan Bapak Majelis ikut mengingatkan anak-anak: teman yang sakit dirangkul, bukan dijauhi.",
+{"end":"Adik Markus sembuh dan kembali bermain dengan teman-temannya. Kakaknya juga diobati, sehingga mereka tidak saling menularkan kaskado lagi. Ibu guru dan Bapak Majelis ikut mengingatkan anak-anak: teman yang sakit dirangkul, bukan dijauhi.",
  "steps":[
   {"t":"Adik Markus kelas 4. Badannya gatal, kulitnya bersisik melingkar seperti ukiran. Teman-teman mulai menjauhinya.","q":"Apa yang dilakukan kader?","o":[
     ["Bicara pribadi dengan orang tuanya dan ajak ke Puskesmas",1,"Benar. Bicara empat mata dan ajak periksa."],
@@ -1904,7 +1907,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     ["Berhenti saja, sudah tidak gatal",0,"Jamur sering belum mati walau gatal berkurang."]]},
   {"t":"Kakaknya ternyata juga mulai gatal dengan pola yang sama.","q":"Apa yang dilakukan?","o":[
     ["Ajak kakaknya periksa juga, dan jangan berbagi handuk atau pakaian",1,"Benar. Orang serumah ikut diperiksa supaya tidak saling menulari."],
-    ["Pakai sisa obat adiknya",0,"Obat harus dari pemeriksaan tenaga kesehatan, bukan berbagi."]]}
+    ["Pakai sisa obat adiknya",0,"Obat diberikan petugas setelah memeriksa, tidak boleh dipakai bergantian."]]}
  ]}
 </script>
   </div>
@@ -1942,7 +1945,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="eyebrow">Modul 4 dari 5</p>
   <h2>Gizi dan Gigi-Mulut</h2>
   <p class="lead">Anak yang giginya sakit sulit makan; anak yang kurang gizi mudah sakit. Keduanya saling berkaitan.</p>
-  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Menjelaskan ASI saja sampai 6 bulan dan makanan pendamping dengan lauk hewani.</li><li>Membedakan berat tidak naik (bicarakan di posyandu) dari tanda anak sakit (antar hari ini).</li><li>Mengajarkan sikat gigi pagi-malam dan kapan sakit gigi harus diperiksa.</li></ol></div>
+  <div class="box"><h3>Setelah modul ini, kader bisa</h3><ol class="list"><li>Menjelaskan ASI saja sampai 6 bulan dan makanan pendamping dengan lauk hewani.</li><li>Membedakan kapan berat badan cukup dibicarakan di posyandu, kapan anak dibawa ke Puskesmas hari ini, dan kapan harus berangkat sekarang.</li><li>Mengajarkan sikat gigi pagi-malam dan kapan sakit gigi harus diperiksa.</li></ol></div>
   <div class="nums">
     <div class="numcard"><div class="d">1 dari 4</div><div class="l">balita di Manokwari Selatan bertubuh pendek (stunting), SSGI 2024: 26,4%</div></div>
     <div class="numcard"><div class="d">1.000</div><div class="l">hari pertama: dari hamil sampai anak berumur 2 tahun, masa paling menentukan</div></div>
@@ -1977,7 +1980,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="gizi-02" hidden data-say="Makanan pendamping ASI mulai umur enam bulan. Mulai dari makanan lumat dan kental, lalu dicincang, lalu makanan keluarga. Umur enam sampai delapan bulan makan dua sampai tiga kali sehari, ditambah ASI; sembilan sampai dua puluh empat bulan tiga sampai empat kali, ditambah satu sampai dua kali makanan selingan. Beri lauk hewani setiap hari: ikan, telur, ayam, atau hati. Singkong, ubi, atau sagu saja tidak cukup.">
+<section class="slide" data-key="gizi-02" hidden data-say="Makanan pendamping ASI mulai umur enam bulan. Mulai dari makanan lumat dan kental, lalu dicincang, lalu makanan keluarga. Umur enam sampai delapan bulan: makan dua sampai tiga kali sehari, ASI tetap diberikan. Umur sembilan bulan sampai dua tahun: tiga sampai empat kali sehari, ditambah satu sampai dua kali makanan selingan. Beri lauk hewani setiap hari: ikan, telur, ayam, atau hati. Singkong, ubi, atau sagu saja tidak cukup.">
   <p class="eyebrow">Bayi 6–24 bulan</p>
   <h2>Makanan pendamping mulai 6 bulan</h2>
   <div class="tablewrap"><table class="table">
@@ -1994,7 +1997,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <section class="slide" data-key="gizi-03" hidden data-say="Isi piring anak satu tahun. Ketuk makanan yang baik untuk sekali makan, lalu periksa.">
   <p class="eyebrow">Permainan</p>
   <h2>Isi piring anak 1 tahun</h2>
-  <figure class="ill"><svg aria-describedby="cap-gizi-03" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Contoh ragam makanan anak satu tahun: makanan pokok, lauk hewani berupa telur, sayur matang, dan potongan buah lunak. Ukuran kelompok pada gambar bukan takaran porsi.">
+  <figure class="ill"><svg aria-describedby="cap-gizi-03" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Contoh ragam makanan anak satu tahun: makanan pokok, lauk hewani berupa telur, sayur matang, dan potongan buah lunak. Gambar ini contoh jenis makanan, bukan ukuran porsi.">
 <style>.ill-gizi03-line{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.ill-gizi03-soft{fill:var(--pulse-soft,#FBE5E8);stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.ill-gizi03-accent{fill:none;stroke:var(--pulse,#C3122D);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}.ill-gizi03-fill{fill:var(--pulse,#C3122D);stroke:none}</style>
 <g class="ill-gizi03-line"><ellipse cx="160" cy="100" rx="109" ry="87"/><ellipse cx="160" cy="100" rx="99" ry="77"/><path d="M30 31v43m-9-43v28c0 9 18 9 18 0V31M30 74v96m259-92v92"/><ellipse cx="289" cy="57" rx="12" ry="23"/></g>
 <path class="ill-gizi03-soft" d="M77 91c0-10 5-16 12-19 0-12 11-20 22-16 5-13 24-11 28 0 13-1 22 10 20 21 6 3 10 8 10 14-30 12-62 12-92 0Z"/>
@@ -2033,12 +2036,12 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </ol>
   <div class="box"><p><b>Bicarakan dengan bidan atau petugas gizi di posyandu bila:</b> berat tidak naik 2 bulan berturut-turut, atau turun.</p></div>
   <div class="box stop"><p><b>Berangkat sekarang bila:</b> anak sangat lemas, sulit dibangunkan, atau tidak bisa minum.</p></div>
-  <div class="box key"><p><b>Antar ke Puskesmas hari ini bila:</b> kedua kaki bengkak, anak sangat kurus, atau tidak mau makan. Ini bisa gizi buruk atau penyakit lain; petugas yang memeriksa.</p></div>
+  <div class="box key"><p><b>Antar ke Puskesmas hari ini bila:</b> kedua kaki bengkak, anak sangat kurus, atau tidak mau makan. Ini bisa gizi buruk atau penyakit lain; biar petugas yang memeriksa.</p></div>
 </section>
 
-<section class="slide" data-key="gizi-05" hidden data-say="Ibu hamil dan menyusui. Makan porsi lebih dengan lauk hewani dan sayur. Minum tablet tambah darah setiap hari selama hamil. Ibu yang cukup gizi melahirkan bayi yang lebih kuat.">
+<section class="slide" data-key="gizi-05" hidden data-say="Ibu hamil dan menyusui. Makan lebih banyak dari biasa, dengan lauk hewani dan sayur. Minum tablet tambah darah setiap hari selama hamil. Ibu yang cukup gizi melahirkan bayi yang lebih kuat.">
   <p class="eyebrow">Ibu</p>
-  <h2>Ibu hamil dan menyusui makan lebih</h2>
+  <h2>Ibu hamil dan menyusui makan lebih banyak</h2>
   <ol class="list">
     <li>Porsi lebih dari biasa, dengan lauk hewani dan sayur setiap kali makan.</li>
     <li>Tablet tambah darah setiap hari selama hamil.</li>
@@ -2049,7 +2052,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <section class="slide" data-key="gizi-06" hidden data-say="Sikat gigi dua kali sehari: pagi setelah sarapan dan malam sebelum tidur, dengan pasta gigi berfluoride. Anak di bawah tiga tahun: sebesar butir beras. Tiga sampai enam tahun: sebesar kacang polong. Orang tua membantu menyikat gigi anak.">
   <p class="eyebrow">Gigi</p>
   <h2>Sikat gigi pagi dan malam</h2>
-  <figure class="ill"><svg aria-describedby="cap-gizi-06" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Pada dua sikat anak berukuran sama, pasta gigi kiri berupa olesan tipis sebesar butir beras untuk usia di bawah tiga tahun, kanan sebesar kacang polong untuk usia tiga sampai enam tahun." class="ill-gizi06">
+  <figure class="ill"><svg aria-describedby="cap-gizi-06" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Kiri: pasta gigi tipis sebesar butir beras untuk anak di bawah tiga tahun. Kanan: sebesar kacang polong untuk anak tiga sampai enam tahun." class="ill-gizi06">
 <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 <path d="M160 25v150" opacity=".22"/>
 <path d="M28 111h52q10 0 17 6h40a6 6 0 0 1 0 12H95q-8-6-15-6H28a6 6 0 0 1 0-12z" fill="var(--pulse-soft,#FBE5E8)"/>
@@ -2061,7 +2064,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <ellipse cx="55" cy="42" rx="9" ry="4" transform="rotate(-30 55 42)" fill="var(--pulse-soft,#FBE5E8)"/>
 <circle cx="215" cy="42" r="10" fill="var(--pulse-soft,#FBE5E8)"/>
 <path d="M55 58v14m-5-5 5 5 5-5M215 59v8m-4-4 4 4 4-4"/>
-</g></svg><figcaption id="cap-gizi-06">Di bawah 3 tahun: olesan tipis sebesar butir beras. Umur 3 sampai 6 tahun: sebesar kacang polong. Orang tua yang menyikatkan.</figcaption></figure>
+</g></svg><figcaption id="cap-gizi-06">Di bawah 3 tahun: olesan tipis sebesar butir beras. Umur 3 sampai 6 tahun: sebesar kacang polong. Gigi anak disikatkan orang tua.</figcaption></figure>
   <ol class="list">
     <li>Sikat gigi <b>2 kali sehari</b>: pagi setelah sarapan dan malam sebelum tidur.</li>
     <li>Pakai pasta gigi berfluoride.</li>
@@ -2101,19 +2104,19 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="q">Adik selalu tidur sambil mengisap botol teh manis. Apa saran kader?</p>
     <div class="opts">
       <button class="opt" data-ok="0" data-fb="Teh manis yang diisap sepanjang tidur membuat gigi cepat berlubang.">Tidak apa-apa, supaya cepat tidur</button>
-      <button class="opt" data-ok="1" data-fb="Benar. Hentikan kebiasaan botol manis saat tidur dan bersihkan giginya sebelum tidur.">Hentikan botol manis saat tidur, sikat gigi sebelum tidur</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Hentikan kebiasaan minum teh manis dari botol saat tidur, dan bersihkan giginya sebelum tidur.">Jangan beri botol teh manis saat tidur; sikat giginya dulu</button>
       <button class="opt" data-ok="0" data-fb="Gula di madu juga merusak gigi, dan madu tidak boleh untuk bayi di bawah 1 tahun.">Ganti teh dengan madu</button>
     </div>
     <p class="fb" aria-live="polite"></p>
   </div>
 </section>
 
-<section class="slide" data-key="gizi-08" hidden data-say="Pinang sirih. Tanda persaudaraan dan adat yang dihormati. Tetapi pinang sendiri, walau tanpa tembakau, bisa menyebabkan kanker mulut. Paling aman tidak memakai atau berhenti; kalau sulit, kurangi sedikit demi sedikit. Jangan beri pinang pada anak, kurangi kapur, jangan campur tembakau, ibu hamil sebaiknya berhenti. Berkumur dan sikat gigi menjaga gigi, tetapi tidak menghapus risiko kanker. Luka atau bercak putih atau merah di mulut yang tidak sembuh dua minggu: periksa ke Puskesmas.">
+<section class="slide" data-key="gizi-08" hidden data-say="Pinang sirih. Tanda persaudaraan dan adat yang dihormati. Tetapi pinang saja, tanpa tembakau pun, bisa menyebabkan kanker mulut. Paling aman tidak makan pinang sama sekali, atau berhenti; kalau sulit, kurangi sedikit demi sedikit. Jangan beri pinang pada anak, kurangi kapur, jangan campur tembakau, ibu hamil sebaiknya berhenti. Berkumur dan sikat gigi menjaga gigi, tetapi tidak menghapus risiko kanker. Luka atau bercak putih atau merah di mulut yang tidak sembuh dua minggu: periksa ke Puskesmas.">
   <p class="eyebrow">Mulut</p>
   <h2>Pinang sirih dan kesehatan mulut</h2>
-  <p class="lead">Pinang sirih adalah tanda persaudaraan dan adat yang dihormati. Tetapi <b>pinang sendiri, walau tanpa tembakau, bisa menyebabkan kanker mulut</b>; kapur dan tembakau menambah risikonya.</p>
+  <p class="lead">Pinang sirih adalah tanda persaudaraan dan adat yang dihormati. Tetapi <b>pinang saja, tanpa tembakau pun, bisa menyebabkan kanker mulut</b>; kapur dan tembakau menambah risikonya.</p>
   <ol class="list">
-    <li><b>Paling aman: tidak memakai, atau berhenti.</b> Sulit berhenti? Kurangi sedikit demi sedikit; bidan bisa membantu.</li>
+    <li><b>Paling aman: tidak makan pinang sama sekali, atau berhenti.</b> Sulit berhenti? Kurangi sedikit demi sedikit; bidan bisa membantu.</li>
     <li>Jangan beri pinang pada anak.</li>
     <li>Kurangi kapur; kapur melukai gusi dan pipi bagian dalam.</li>
     <li>Jangan campur dengan tembakau.</li>
@@ -2131,14 +2134,14 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="gizi-09" hidden data-say="Tanda bahaya sakit gigi. Sulit membuka mulut, sulit menelan, atau sulit bernapas: panggil bantuan dan berangkat sekarang, karena bengkaknya bisa menutup jalan napas. Sakit gigi disertai pipi atau leher bengkak, atau demam: ke Puskesmas hari ini juga; jangan ditunda dengan kumur air garam, karena infeksi gigi bisa menyebar. Periksakan juga anak yang tidak mau makan karena sakit gigi, dan luka di mulut yang tidak sembuh dua minggu. Puskesmas Momiwaren belum punya dokter gigi; perawat atau dokter Puskesmas akan memeriksa dan merujuk.">
+<section class="slide" data-key="gizi-09" hidden data-say="Tanda bahaya sakit gigi. Sulit membuka mulut, sulit menelan, atau sulit bernapas: panggil bantuan dan berangkat sekarang, karena bengkaknya bisa menutup jalan napas. Sakit gigi disertai pipi atau leher bengkak, atau demam: ke Puskesmas hari ini juga. Jangan hanya berkumur air garam lalu menunda berobat, karena infeksi gigi bisa menyebar. Periksakan juga anak yang tidak mau makan karena sakit gigi, dan luka di mulut yang tidak sembuh dua minggu. Puskesmas Momiwaren belum punya dokter gigi; perawat atau dokter Puskesmas akan memeriksa dan merujuk.">
   <p class="eyebrow">Tanda bahaya</p>
   <h2>Kapan sakit gigi harus diperiksa</h2>
   <div class="box stop"><h3>Berangkat SEKARANG, panggil bantuan</h3>
     <p>Sakit gigi dengan <b>sulit membuka mulut, sulit menelan, atau sulit bernapas</b>: bengkaknya bisa menutup jalan napas.</p></div>
   <div class="box key"><h3>Ke Puskesmas HARI INI bila sakit gigi disertai</h3>
     <ol class="list"><li>Pipi atau leher bengkak</li><li>Demam</li></ol>
-    <p>Jangan ditunda dengan kumur air garam atau obat sendiri. Infeksi gigi bisa menyebar.</p></div>
+    <p>Jangan hanya berkumur air garam atau minum obat sendiri lalu menunda berobat. Infeksi gigi bisa menyebar.</p></div>
   <p><b>Periksakan juga:</b></p>
   <ol class="list">
     <li>Anak tidak mau makan karena sakit gigi</li>
@@ -2156,14 +2159,14 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
  "steps":[
   {"t":"Adik Nando umur 10 bulan. Setiap hari ia makan bubur singkong saja.","q":"Apa saran kader?","o":[
     ["Tambahkan ikan atau telur dan sayur hijau ke buburnya",1,"Benar. Anak perlu lauk hewani setiap hari untuk tumbuh."],
-    ["Tambahkan gula supaya lebih lahap",0,"Gula memberi tenaga, tetapi tidak menggantikan lauk hewani dan sayur yang dibutuhkan untuk tumbuh, dan merusak gigi."],
+    ["Tambahkan gula supaya lebih lahap",0,"Gula memang memberi tenaga, tetapi tidak bisa menggantikan lauk hewani dan sayur untuk tumbuh. Gula juga merusak gigi."],
     ["Teruskan saja, yang penting kenyang",0,"Kenyang belum tentu cukup gizi."]]},
   {"t":"Di posyandu, berat Adik Nando tidak naik dua bulan berturut-turut.","q":"Apa yang dilakukan?","o":[
     ["Bicarakan dengan bidan atau petugas gizi",1,"Benar. Berat yang tidak naik perlu diperiksa penyebabnya."],
     ["Tunggu saja, nanti juga naik",0,"Menunggu membuat masalah gizi makin berat."]]},
   {"t":"Mama bercerita Adik Nando tidur sambil mengisap botol teh manis.","q":"Apa saran kader?","o":[
-    ["Hentikan botol manis saat tidur dan bersihkan giginya sebelum tidur",1,"Benar. Kebiasaan ini membuat gigi cepat berlubang dan sakit."],
-    ["Biarkan, supaya Adik cepat tidur",0,"Gigi yang sakit membuat anak malas makan."]]}
+    ["Jangan lagi beri botol teh manis saat tidur, dan sikat giginya sebelum tidur",1,"Benar. Tidur sambil mengisap botol teh manis membuat gigi cepat berlubang dan sakit."],
+    ["Biarkan, supaya Adik cepat tidur",0,"Sakit gigi membuat anak sulit makan."]]}
  ]}
 </script>
   </div>
@@ -2185,7 +2188,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <ol class="list">
       <li>ASI saja sampai 6 bulan, lanjut sampai 2 tahun.</li>
       <li>Mulai 6 bulan: makanan pendamping dengan lauk hewani setiap hari.</li>
-      <li>Timbang setiap bulan; berat tidak naik berarti bicarakan dengan bidan.</li>
+      <li>Timbang setiap bulan. Berat tidak naik? Bicarakan dengan bidan.</li>
       <li>Sikat gigi pagi dan malam; kurangi yang manis; jangan beri pinang pada anak.</li>
     </ol>
   </div>
@@ -2205,7 +2208,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box tip">
     <h3>Untuk fasilitator</h3>
     <ol class="list">
-      <li>Sepakati aturan: saling menghormati, tidak menertawakan, cerita teman tidak dibawa keluar. Satu pengecualian: bila keselamatan seseorang terancam, fasilitator mencari bantuan, dan memberi tahu yang bercerita lebih dulu.</li>
+      <li>Sepakati aturan: saling menghormati, tidak menertawakan, cerita teman tidak diceritakan ke luar kelompok. Kalau keselamatan seseorang terancam, fasilitator boleh mencari bantuan, tetapi bicarakan dulu dengan orang yang bercerita.</li>
       <li>Sediakan kotak pertanyaan tanpa nama.</li>
       <li>Bila perlu, pisahkan kelompok putra dan putri.</li>
       <li>Ada yang bercerita mengalami kekerasan? Dengarkan, jangan menyalahkan, lalu hubungkan ke bidan atau layanan pengaduan.</li>
@@ -2266,17 +2269,17 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="remaja-03" hidden data-say="Pacaran sehat. Saling menghormati, bebas berteman, boleh bilang tidak, dan saling mendukung sekolah. Tidak berarti tidak. Diam atau mabuk bukan berarti setuju.">
+<section class="slide" data-key="remaja-03" hidden data-say="Pacaran sehat. Saling menghormati, bebas berteman, boleh bilang tidak, dan saling mendukung sekolah. Kalau seseorang bilang tidak, artinya ia tidak setuju. Diam atau mabuk juga bukan tanda setuju.">
   <p class="eyebrow">Pacaran</p>
   <h2>Pacaran sehat: saling menghormati</h2>
-  <p class="box key"><b>Tidak berarti tidak.</b> Diam, takut, atau mabuk bukan berarti setuju.</p>
+  <p class="box key"><b>Kalau seseorang bilang “tidak”, artinya ia tidak setuju.</b> Diam, takut, atau mabuk juga bukan tanda setuju.</p>
   <div class="box pick" data-id="pacaran" data-ok-fb="Benar. Semua itu tanda pacaran yang tidak sehat. Ceritakan pada orang yang kamu percaya.">
     <p class="q">Ketuk semua tanda pacaran yang <b>tidak sehat</b>, lalu periksa.</p>
     <div class="opts">
       <button class="opt" data-ok="1" data-need="1" data-label="dilarang bertemu teman">Dilarang bertemu teman atau keluarga</button>
       <button class="opt" data-ok="1" data-need="1" data-label="dipaksa berhubungan seks">Dipaksa atau dibujuk berhubungan seks</button>
       <button class="opt" data-ok="1" data-need="1" data-label="diancam fotonya disebarkan">Diancam fotonya akan disebarkan</button>
-      <button class="opt" data-ok="1" data-need="1" data-label="diberi uang atau barang supaya mau">Diberi uang, pulsa, atau barang supaya mau</button>
+      <button class="opt" data-ok="1" data-need="1" data-label="diberi uang atau barang supaya mau berhubungan seks">Diberi uang, pulsa, atau barang supaya mau berhubungan seks</button>
       <button class="opt" data-ok="0" data-label="saling mendukung sekolah">Saling mendukung sekolah dan cita-cita</button>
       <button class="opt" data-ok="0" data-label="boleh bilang tidak">Boleh bilang tidak tanpa dimarahi</button>
     </div>
@@ -2285,13 +2288,13 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="remaja-04" hidden data-say="Kalau mengalami kekerasan. Kekerasan seksual tidak pernah salah korban. Ceritakan pada orang dewasa yang kamu percaya. Datang ke Puskesmas sekarang. Obat pencegah HIV makin cepat makin baik, paling lambat tiga hari; pencegah kehamilan sampai lima hari. Lewat dari itu tetap datang: pemeriksaan, dukungan, dan perlindungan tetap bisa diberikan. Lapor ke SAPA seratus dua puluh sembilan.">
+<section class="slide" data-key="remaja-04" hidden data-say="Kalau mengalami kekerasan. Korban kekerasan seksual tidak pernah bersalah. Ceritakan pada orang dewasa yang kamu percaya. Datang ke Puskesmas sekarang. Obat pencegah HIV makin cepat dimulai makin baik, paling lambat tiga hari setelah kejadian; obat pencegah kehamilan masih bisa sampai lima hari. Lewat dari itu tetap datang: pemeriksaan, dukungan, dan perlindungan tetap bisa diberikan. Lapor ke SAPA seratus dua puluh sembilan.">
   <p class="eyebrow">Kekerasan</p>
   <h2>Kalau mengalami kekerasan</h2>
-  <p class="lead">Kekerasan seksual <b>tidak pernah salah korban</b>, siapa pun pelakunya.</p>
+  <p class="lead">Korban kekerasan seksual <b>tidak pernah bersalah</b>, siapa pun pelakunya.</p>
   <ol class="list">
     <li>Ceritakan pada orang dewasa yang kamu percaya: orang tua, guru, bidan, atau pendeta.</li>
-    <li>Datang ke Puskesmas <b>sekarang</b>. Obat pencegah HIV <b>makin cepat makin baik, paling lambat 3 hari</b> (72 jam); pencegah kehamilan <b>sampai 5 hari</b>. <b>Lewat dari itu tetap datang</b>: pemeriksaan, pengobatan, dukungan, dan perlindungan tetap bisa diberikan.</li>
+    <li>Datang ke Puskesmas <b>sekarang</b>. Obat pencegah HIV <b>makin cepat dimulai makin baik, paling lambat 3 hari</b> (72 jam) setelah kejadian; obat pencegah kehamilan masih bisa <b>sampai 5 hari</b>. <b>Lewat dari itu tetap datang</b>: pemeriksaan, pengobatan, dukungan, dan perlindungan tetap bisa diberikan.</li>
     <li>Laporkan supaya mendapat pendampingan dan perlindungan.</li>
   </ol>
   <div class="nums">
@@ -2302,7 +2305,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <p class="q">Temanmu bercerita tadi malam dipaksa berhubungan seks oleh orang yang lebih tua. Ia sekarang di tempat aman. Apa yang paling menolong?</p>
     <div class="opts">
       <button class="opt" data-ok="0" data-fb="Disuruh diam membuat korban sendirian dan pelaku bisa mengulang.">Suruh dia diam dulu supaya tidak malu</button>
-      <button class="opt" data-ok="1" data-fb="Benar. Percayai, jaga rahasianya, dan temani ke Puskesmas sekarang; obat pencegah makin cepat makin baik. Ajak juga orang dewasa yang dipercaya, misalnya guru atau bidan.">Percayai dia dan temani ke Puskesmas sekarang</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Percayai, jaga rahasianya, dan temani ke Puskesmas sekarang; obat pencegah makin cepat diberikan makin baik. Ajak juga orang dewasa yang dipercaya, misalnya guru atau bidan.">Percayai dia dan temani ke Puskesmas sekarang</button>
       <button class="opt" data-ok="0" data-fb="Menyebarkan cerita menambah luka. Jaga rahasianya.">Ceritakan di grup supaya semua bisa membantu</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -2341,10 +2344,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="box key"><b>Jangan minum ramuan atau obat dari orang yang bukan tenaga kesehatan untuk menggugurkan.</b> Bisa menyebabkan perdarahan, infeksi, dan kematian. Bicarakan dengan bidan atau dokter tentang langkah yang aman dan sesuai aturan.</p>
 </section>
 
-<section class="slide" data-key="remaja-07" hidden data-say="HIV. Tanah Papua termasuk daerah dengan kasus HIV tertinggi di Indonesia. HIV menular lewat hubungan seks tanpa kondom, jarum bergantian, dan dari ibu ke bayi. Tidak menular lewat bersalaman, makan bersama, atau gigitan nyamuk. Tes HIV di Puskesmas gratis dan rahasia. Tes yang terlalu cepat sesudah berisiko bisa masih negatif; petugas memberi tahu kapan tes diulang.">
+<section class="slide" data-key="remaja-07" hidden data-say="HIV. Tanah Papua termasuk daerah dengan kasus HIV tertinggi di Indonesia. HIV menular lewat hubungan seks tanpa kondom, jarum bergantian, dan dari ibu ke bayi. Tidak menular lewat bersalaman, makan bersama, atau gigitan nyamuk. Tes HIV di Puskesmas gratis dan rahasia. Tes yang dilakukan terlalu cepat setelah kejadian berisiko bisa saja masih negatif; petugas akan memberi tahu kapan perlu tes ulang.">
   <p class="eyebrow">HIV</p>
   <h2>HIV: tahu cara menular, tahu cara mencegah</h2>
-  <p class="lead">Tanah Papua termasuk daerah dengan kasus HIV tertinggi di Indonesia. HIV bisa dicegah, dites gratis, dan diobati.</p>
+  <p class="lead">Tanah Papua termasuk daerah dengan kasus HIV tertinggi di Indonesia. Penularan HIV bisa dicegah, tesnya gratis, dan HIV bisa diobati.</p>
   <div class="grid2">
     <div class="box"><h3>Menular lewat</h3>
       <ol class="list"><li>Hubungan seks tanpa kondom dengan orang yang terinfeksi</li><li>Jarum suntik, alat tato, atau tindik bergantian</li><li>Dari ibu ke bayi, yang bisa dicegah bila ibu dites dan berobat</li></ol></div>
@@ -2352,7 +2355,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <ol class="list"><li>Bersalaman dan berpelukan</li><li>Makan bersama dan berbagi gelas</li><li>Gigitan nyamuk</li><li>Mandi atau berenang bersama</li></ol></div>
   </div>
   <div class="box key"><h3>Cara mencegah</h3>
-    <ol class="list"><li>Tunda hubungan seks.</li><li>Setia pada satu pasangan, dan keduanya sudah dites dengan hasil negatif. Tes yang terlalu cepat sesudah berisiko bisa masih negatif: ikuti saran petugas kapan tes diulang.</li><li>Pakai kondom bila berhubungan seks.</li><li>Jangan berbagi jarum, alat tato, atau tindik.</li><li>Tes HIV di Puskesmas: gratis dan rahasia.</li></ol></div>
+    <ol class="list"><li>Tunda hubungan seks.</li><li>Setia pada satu pasangan, dan keduanya sudah dites dengan hasil negatif. Tes yang dilakukan terlalu cepat setelah kejadian berisiko bisa saja masih negatif; ikuti saran petugas kapan perlu tes ulang.</li><li>Pakai kondom bila berhubungan seks.</li><li>Jangan berbagi jarum, alat tato, atau tindik.</li><li>Tes HIV di Puskesmas: gratis dan rahasia.</li></ol></div>
   <div class="box quiz" data-id="hiv1">
     <p class="q">“HIV bisa menular lewat makan sepiring bersama.”</p>
     <div class="pair">
@@ -2391,19 +2394,19 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </div>
 </section>
 
-<section class="slide" data-key="remaja-09" hidden data-say="Alkohol, lem, dan rokok. Mabuk membuat orang mudah berkelahi, celaka di jalan, dan melakukan seks tanpa persetujuan atau tanpa pengaman. Menghirup lem merusak otak dan bisa menyebabkan kematian mendadak. Rokok merusak paru-paru dan jantung. Pinang, walau tanpa tembakau, bisa menyebabkan kanker mulut.">
+<section class="slide" data-key="remaja-09" hidden data-say="Alkohol, lem, dan rokok. Mabuk membuat orang mudah berkelahi atau celaka di jalan. Saat mabuk, orang juga lebih berisiko memaksa orang lain berhubungan seks atau menjadi korban paksaan, dan berhubungan seks tanpa kondom. Menghirup lem merusak otak dan bisa menyebabkan kematian mendadak. Rokok merusak paru-paru dan jantung. Pinang, tanpa tembakau pun, bisa menyebabkan kanker mulut.">
   <p class="eyebrow">Alkohol dan zat</p>
   <h2>Alkohol, lem, dan rokok</h2>
   <p class="lead">Di banyak kampung, gangguan orang mabuk sering dikeluhkan warga.</p>
   <ol class="list">
-    <li>Mabuk membuat orang mudah berkelahi, celaka di jalan, dan melakukan seks tanpa persetujuan atau tanpa pengaman.</li>
+    <li>Mabuk membuat orang mudah berkelahi atau celaka di jalan. Saat mabuk, orang juga lebih berisiko memaksa orang lain berhubungan seks atau menjadi korban paksaan, dan berhubungan seks tanpa kondom.</li>
     <li>Menghirup lem merusak otak dan bisa menyebabkan kematian mendadak.</li>
-    <li>Rokok merusak paru-paru, jantung, gigi, dan mulut. Pinang, walau tanpa tembakau, merusak gigi dan gusi dan bisa menyebabkan kanker mulut.</li>
+    <li>Rokok merusak paru-paru, jantung, gigi, dan mulut. Pinang, tanpa tembakau pun, merusak gigi dan gusi serta bisa menyebabkan kanker mulut.</li>
   </ol>
   <div class="box quiz" data-id="lem">
     <p class="q">Teman-teman mengajakmu mencoba menghirup lem supaya dianggap berani.</p>
     <div class="opts">
-      <button class="opt" data-ok="0" data-fb="Sekali pun bisa berbahaya bagi otak dan jantung.">Coba sekali saja</button>
+      <button class="opt" data-ok="0" data-fb="Mencoba sekali saja sudah bisa berbahaya bagi otak dan jantung.">Coba sekali saja</button>
       <button class="opt" data-ok="1" data-fb="Benar. Menolak itu berani. Ajak kegiatan lain dan cerita ke orang yang kamu percaya.">Tolak dengan tegas dan ajak main bola atau kegiatan lain</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -2420,11 +2423,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   </ol>
   <div class="nums">
     <div class="numcard"><a class="d h119" href="tel:119" aria-label="Telepon 119, lalu tekan 8">119 · 8</a><div class="l">Healing119: telepon 119 lalu tekan 8, atau buka healing119.id. Gratis, 24 jam.</div></div>
-    <div class="numcard"><div class="d">Puskesmas</div><div class="l">Konseling dan rujukan bila perlu</div></div>
+    <div class="numcard"><div class="d kata">Puskesmas</div><div class="l">Konseling dan rujukan bila perlu</div></div>
   </div>
 </section>
 
-<section class="slide" data-key="remaja-11" hidden data-say="Tempat bertanya yang aman. Banyak Puskesmas punya layanan kesehatan peduli remaja untuk bertanya, periksa, dan konseling; tanyakan jadwalnya. Ada juga posyandu remaja, guru bimbingan konseling, pendeta, dan kader. Petugas menjaga rahasiamu. Hanya bila keselamatanmu atau orang lain terancam, misalnya ada kekerasan, petugas perlu melibatkan orang lain untuk melindungi, dan menjelaskannya dulu kepadamu.">
+<section class="slide" data-key="remaja-11" hidden data-say="Tempat bertanya yang aman. Banyak Puskesmas punya layanan kesehatan peduli remaja untuk bertanya, periksa, dan konseling; tanyakan jadwalnya. Ada juga posyandu remaja, guru bimbingan konseling, pendeta, dan kader. Ceritamu dijaga rahasia. Petugas hanya akan mengajak pihak lain membantu kalau keselamatanmu atau orang lain terancam, misalnya ada kekerasan, dan itu pun dibicarakan dulu denganmu.">
   <p class="eyebrow">Layanan</p>
   <h2>Tempat bertanya yang aman</h2>
   <ol class="list">
@@ -2432,7 +2435,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <li><b>Posyandu remaja</b>, bila ada di kampung.</li>
     <li>Guru bimbingan konseling, pendeta, atau kader yang kamu percaya.</li>
   </ol>
-  <p class="box tip">Petugas kesehatan menjaga rahasiamu. Hanya bila keselamatanmu atau orang lain terancam, misalnya ada kekerasan, petugas perlu melibatkan orang lain untuk melindungi, dan menjelaskannya dulu kepadamu. Kamu boleh bertanya tanpa takut dimarahi.</p>
+  <p class="box tip">Ceritamu dijaga rahasia. Petugas hanya akan mengajak pihak lain membantu kalau keselamatanmu atau orang lain terancam, misalnya ada kekerasan, dan itu pun dibicarakan dulu denganmu. Kamu boleh bertanya tanpa takut dimarahi.</p>
   <div class="box quiz" data-id="layanan">
     <p class="q">Kamu ingin bertanya soal haid yang tidak teratur, tetapi malu. Apa yang paling tepat?</p>
     <div class="opts">
@@ -2450,14 +2453,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box story" data-id="cerita">
 <script type="application/json">
 {"end":"Yosina, Agus, dan teman-temannya tetap sekolah, saling menjaga, dan tahu ke mana mencari bantuan.",
+ "bahas":"apa lagi yang bisa dilakukan Yosina dan Agus? Tidak perlu menceritakan pengalaman pribadi; yang ingin bercerita bisa bicara berdua dengan fasilitator.",
  "steps":[
   {"t":"Yosina, 16 tahun, diajak pacarnya ke pesta. Ada minuman keras, dan pacarnya mengajaknya ke tempat sepi.","q":"Apa yang sebaiknya Yosina lakukan?","o":[
     ["Menolak, tetap bersama teman-temannya, dan pulang bersama",1,"Benar. Yosina berhak menolak, dan tetap bersama teman membuatnya lebih aman."],
-    ["Ikut supaya pacarnya tidak marah",0,"Pacar yang menghormati tidak akan memaksa. Tidak berarti tidak."],
+    ["Ikut supaya pacarnya tidak marah",0,"Pacar yang menghormati tidak akan memaksa. Kalau Yosina bilang tidak, artinya ia tidak setuju."],
     ["Minum sedikit supaya berani",0,"Mabuk membuat orang sulit menolak dan mudah celaka."]]},
   {"t":"Agus, 18 tahun, ditantang teman-temannya menghirup lem supaya dianggap berani.","q":"Apa yang sebaiknya Agus lakukan?","o":[
     ["Menolak dan mengajak teman-teman main bola",1,"Benar. Menolak itu berani, dan Agus bisa mengajak kegiatan lain."],
-    ["Mencoba sekali supaya tidak diejek",0,"Sekali pun bisa merusak otak dan jantung."]]},
+    ["Mencoba sekali supaya tidak diejek",0,"Mencoba sekali saja sudah bisa merusak otak dan jantung."]]},
   {"t":"Beberapa minggu kemudian, teman Yosina bercerita haidnya terlambat setelah berhubungan seks. Ia sangat takut.","q":"Apa yang sebaiknya Yosina lakukan?","o":[
     ["Menemaninya ke bidan; bidan menjaga rahasia",1,"Benar. Bidan bisa memeriksa dan membantu menentukan langkah berikutnya."],
     ["Menyarankan minum ramuan peluruh",0,"Ramuan untuk menggugurkan bisa menyebabkan perdarahan dan kematian."],
@@ -2474,7 +2478,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box tes" data-id="tes-akhir" data-phase="post"></div>
 </section>
 
-<section class="slide" data-key="remaja-13" hidden data-say="Selesai. Ingat: perubahan tubuh itu wajar. Tidak berarti tidak. Kekerasan tidak pernah salah korban: cerita, datang ke Puskesmas sekarang, lewat tiga hari pun tetap datang, lapor ke SAPA seratus dua puluh sembilan. Tunda menikah sampai minimal sembilan belas tahun. HIV bisa dicegah, dan tes di Puskesmas gratis dan rahasia. Perasaanmu penting.">
+<section class="slide" data-key="remaja-13" hidden data-say="Selesai. Ingat: perubahan tubuh itu wajar. Kalau seseorang bilang tidak, artinya ia tidak setuju. Korban kekerasan tidak pernah bersalah. Ceritakan, datang ke Puskesmas sekarang, dan laporkan ke SAPA seratus dua puluh sembilan. Lewat tiga hari pun tetap datang. Tunda menikah sampai minimal sembilan belas tahun. HIV bisa dicegah, dan tes di Puskesmas gratis dan rahasia. Perasaanmu penting.">
   <p class="eyebrow">Selesai</p>
   <h2>Tubuhmu, keputusanmu, masa depanmu</h2>
   <div class="board"></div>
@@ -2482,7 +2486,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     <h3>Yang diingat</h3>
     <ol class="list">
       <li>Perubahan tubuh itu wajar; haid tidak memalukan.</li>
-      <li>Tidak berarti tidak. Kekerasan tidak pernah salah korban: cerita, ke Puskesmas <b>sekarang</b> (obat pencegah HIV makin cepat makin baik, paling lambat 3 hari; pencegah kehamilan sampai 5 hari; lewat pun tetap datang), lapor ke SAPA 129.</li>
+      <li>Kalau seseorang bilang “tidak”, artinya ia tidak setuju. Korban kekerasan tidak pernah bersalah. Ceritakan, datang ke Puskesmas <b>sekarang</b>, dan laporkan ke SAPA 129. Obat pencegah HIV makin cepat dimulai makin baik, paling lambat 3 hari; obat pencegah kehamilan masih bisa sampai 5 hari. Sudah lewat pun tetap datang.</li>
       <li>Tunda menikah sampai minimal 19 tahun.</li>
       <li>HIV bisa dicegah; tes di Puskesmas gratis dan rahasia.</li>
       <li>Perasaanmu penting: Healing119, telepon 119 lalu tekan 8.</li>
@@ -2496,10 +2500,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
 <div class="deck" data-mod="tanda" data-cover="img/perahu-sumano.webp" data-pos="center 70%" data-credit="Perahu di Sungai Sumano · Lefaan · CC BY-SA 4.0" data-n="Kartu" data-alt data-title="Kartu Tanda Bahaya" data-desc="Kapan harus ke Puskesmas hari itu juga, hitung napas anak, malaria, diare, gigitan ular, dan nomor penting." hidden>
 
-<section class="slide" data-key="tanda-00" data-say="Kartu Tanda Bahaya. Ada dua tingkat. Satu tanda gawat saja sudah cukup untuk berangkat sekarang, walau tanda lain lebih ringan. Tanda gawat: panggil bantuan dan berangkat sekarang, jangan tunggu. Perdarahan banyak pada ibu hamil, bersalin, nifas, atau siapa pun; kejang; tidak sadar atau sulit dibangunkan; tidak bernapas normal, sesak berat, bibir atau lidah biru; ibu hamil atau nifas dengan sakit kepala hebat atau pandangan kabur, walau tanpa bengkak; bayi di bawah dua bulan yang tidak mau menyusu, lemas, kejang, napas cepat atau merintih, demam atau badan dingin, kuning di hari pertama, atau kuning sampai telapak tangan dan kaki; ibu hamil yang merasa bayi dalam perut kurang bergerak, hubungi bidan sekarang, dan bila tidak tersambung, berangkat; anak tidak bisa minum atau memuntahkan semua; anak dengan dinding dada bawah tertarik ke dalam, atau diare dengan mata cekung dan cubitan kulit perut yang sangat lambat kembali, lebih dari dua detik; air ketuban pecah sebelum waktunya, hijau, atau berbau; kulit melepuh atau mengelupas luas; digigit ular; tenggelam, walau sudah sadar. Tidak sadar dan tidak bernapas normal? Mulai tekan dada sambil orang lain memanggil bantuan. Tanda lain: periksa ke Puskesmas hari ini juga, jangan tunggu besok. Demam pada siapa pun diperiksa darah malaria; ibu hamil muntah terus sampai tidak bisa makan; ibu hamil atau nifas yang wajah dan tangannya tiba-tiba bengkak, untuk diukur tekanan darahnya; bayi dengan kuning yang muncul di hari kedua atau sesudahnya dan telapaknya belum kuning, atau tali pusat bernanah; anak napas cepat, atau diare dengan mata cekung atau cubitan kulit lambat kembali, tanpa tanda gawat; batuk dua minggu atau lebih; bercak kulit mati rasa; luka atau sariawan yang tidak sembuh dua minggu. Keluarga ingin berembuk dulu? Berdoa dan berembuk bisa sambil berangkat.">
+<section class="slide" data-key="tanda-00" data-say="Kartu Tanda Bahaya. Ada dua tingkat: berangkat sekarang, atau periksa hari ini. Cukup satu tanda gawat untuk langsung berangkat sekarang. Tanda gawat, panggil bantuan dan berangkat sekarang: perdarahan banyak pada siapa pun, termasuk ibu hamil, bersalin, atau nifas. Kejang. Tidak sadar atau sulit dibangunkan. Tidak bernapas normal, sesak berat, atau bibir dan lidah biru. Ibu hamil atau nifas dengan sakit kepala hebat atau pandangan kabur, walaupun tidak bengkak. Bayi di bawah dua bulan yang tidak mau menyusu, lemas, kejang, napas cepat, merintih, demam, badan dingin, kuning di hari pertama, atau kuning sampai telapak tangan dan kaki. Ibu hamil yang merasa bayi dalam perut kurang bergerak: telepon bidan sekarang, dan kalau tidak tersambung, langsung berangkat. Anak yang tidak bisa minum atau memuntahkan semua. Anak dengan dinding dada bawah tertarik ke dalam. Anak diare dengan mata cekung dan cubitan kulit perut yang kembali sangat lambat, lebih dari dua detik. Ketuban pecah sebelum waktunya, atau air ketuban hijau atau berbau. Kulit melepuh atau mengelupas luas. Digigit ular. Tenggelam, walau sudah sadar. Tidak sadar dan tidak bernapas normal? Mulai tekan dada sambil orang lain memanggil bantuan. Tanda lain: periksa ke Puskesmas hari ini juga, jangan tunggu besok. Demam pada siapa pun, untuk periksa darah malaria. Ibu hamil yang muntah terus sampai tidak bisa makan. Ibu hamil atau nifas yang wajah dan tangannya tiba-tiba bengkak, supaya diukur tekanan darahnya. Bayi yang kuning mulai hari kedua atau sesudahnya, selama telapak tangan dan kakinya belum kuning, atau tali pusatnya bernanah. Anak dengan napas cepat, atau anak diare dengan mata cekung atau cubitan kulit yang lambat kembali, tanpa tanda gawat. Batuk dua minggu atau lebih. Bercak kulit mati rasa. Luka atau sariawan yang tidak sembuh dua minggu. Keluarga ingin berembuk dulu? Berdoa dan berembuk bisa sambil berangkat.">
   <p class="eyebrow">Dipakai semua kader</p>
   <h2>Berangkat sekarang, atau periksa hari ini?</h2>
-  <p class="lead">Dua tingkat. <b>Sekarang</b> berarti panggil bantuan dan berangkat saat itu juga. <b>Hari ini</b> berarti periksa ke Puskesmas hari ini, jangan tunggu besok. <b>Satu tanda gawat saja sudah cukup</b> untuk berangkat sekarang, walau tanda lain lebih ringan.</p>
+  <p class="lead">Dua tingkat. <b>Sekarang</b> berarti panggil bantuan dan berangkat saat itu juga. <b>Hari ini</b> berarti periksa ke Puskesmas hari ini, jangan tunggu besok. <b>Cukup satu tanda gawat</b> untuk langsung berangkat sekarang.</p>
   <div class="box stop">
     <h3>Berangkat SEKARANG, panggil bantuan</h3>
     <ol class="list">
@@ -2507,24 +2511,24 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Kejang</li>
       <li>Tidak sadar, atau sulit dibangunkan</li>
       <li>Tidak bernapas normal, sesak berat, bibir atau lidah biru</li>
-      <li>Ibu hamil atau nifas: sakit kepala hebat, atau pandangan kabur, walau tanpa bengkak</li>
+      <li>Ibu hamil atau nifas: sakit kepala hebat atau pandangan kabur, walaupun tidak bengkak</li>
       <li>Bayi di bawah 2 bulan: tidak mau menyusu, lemas, kejang, napas cepat atau merintih, demam atau badan dingin, kuning di hari pertama, atau kuning sampai telapak tangan dan kaki</li>
-      <li>Ibu hamil: bayi dalam perut kurang bergerak dibanding biasanya (hubungi bidan sekarang; tidak tersambung, berangkat)</li>
+      <li>Ibu hamil: bayi dalam perut kurang bergerak dibanding biasanya (telepon bidan sekarang; kalau tidak tersambung, langsung berangkat)</li>
       <li>Anak tidak bisa minum, atau memuntahkan semua</li>
       <li>Anak: dinding dada bawah tertarik ke dalam saat bernapas; diare dengan mata cekung <b>dan</b> cubitan kulit perut kembali sangat lambat (lebih dari 2 detik)</li>
-      <li>Air ketuban pecah sebelum waktunya, hijau, atau berbau</li>
+      <li>Ketuban pecah sebelum waktunya, atau air ketuban hijau atau berbau</li>
       <li>Kulit melepuh atau mengelupas luas, apalagi di mulut atau mata</li>
       <li>Digigit ular; tenggelam, walau sudah sadar</li>
     </ol>
-    <p class="muted">Tidak sadar dan tidak bernapas normal? Mulai tekan dada sambil orang lain memanggil bantuan (Modul 1; anak dan bayi: layar <b>Anak dan bayi</b>).</p>
+    <p class="muted">Tidak sadar dan tidak bernapas normal? Mulai tekan dada sambil orang lain memanggil bantuan. Caranya ada di Modul 1; untuk anak dan bayi, buka layar <b>Anak dan bayi</b>.</p>
   </div>
   <div class="box key">
     <h3>Periksa HARI INI, jangan tunggu besok</h3>
     <ol class="list">
       <li>Demam, siapa pun: periksa darah malaria</li>
       <li>Ibu hamil: muntah terus sampai tidak bisa makan</li>
-      <li>Ibu hamil atau nifas: wajah dan tangan tiba-tiba bengkak (ukur tekanan darah)</li>
-      <li>Bayi: kuning yang muncul di hari kedua atau sesudahnya dan telapak belum kuning; tali pusat bernanah</li>
+      <li>Ibu hamil atau nifas: wajah dan tangan tiba-tiba bengkak (perlu diukur tekanan darahnya)</li>
+      <li>Bayi: kuning mulai hari kedua atau sesudahnya, tetapi telapak tangan dan kaki belum kuning; tali pusat bernanah</li>
       <li>Anak: napas cepat; diare dengan mata cekung atau cubitan kulit lambat kembali, tanpa tanda gawat</li>
       <li>Batuk 2 minggu atau lebih: periksa dahak</li>
       <li>Bercak kulit mati rasa; luka atau sariawan yang tidak sembuh 2 minggu</li>
@@ -2533,7 +2537,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <p class="box tip">Keluarga takut atau ingin berembuk dulu? Itu wajar. Berdoa dan berembuk bisa sambil berangkat. Perdarahan, kejang, dan sesak tidak bisa menunggu.</p>
 </section>
 
-<section class="slide" data-key="tanda-01" hidden data-say="Hitung napas anak. Periksa dulu. Anak sulit dibangunkan atau sangat lemas, kejang, bibir atau lidah kebiruan, dada bawah tertarik ke dalam saat menarik napas, tidak bisa minum atau menyusu, atau memuntahkan semua? Bayi di bawah dua bulan yang demam, badan teraba dingin, atau merintih? Jangan hitung, langsung antar ke Puskesmas sekarang. Kalau tidak ada tanda itu, hitung saat anak tenang atau tidur. Tekan mulai, lalu ketuk lingkaran setiap kali perut atau dadanya naik, selama enam puluh detik. Napas cepat: umur di bawah dua bulan enam puluh kali atau lebih, dua sampai sebelas bulan lima puluh kali atau lebih, dua belas bulan sampai belum lima tahun empat puluh kali atau lebih.">
+<section class="slide" data-key="tanda-01" hidden data-say="Hitung napas anak. Periksa dulu. Anak sulit dibangunkan atau sangat lemas, kejang, bibir atau lidah kebiruan, dada bawah tertarik ke dalam saat menarik napas, tidak bisa minum atau menyusu, atau memuntahkan semua? Bayi di bawah dua bulan yang demam, badan teraba dingin, atau merintih? Jangan hitung, langsung antar ke Puskesmas sekarang. Kalau tidak ada tanda itu, hitung saat anak tenang atau tidur. Tekan mulai, lalu ketuk lingkaran setiap kali perut atau dadanya naik, selama enam puluh detik. Napas cepat: umur di bawah dua bulan enam puluh kali atau lebih, dua sampai sebelas bulan lima puluh kali atau lebih, satu sampai empat tahun empat puluh kali atau lebih.">
   <p class="eyebrow">Alat bantu</p>
   <h2>Hitung napas anak 60 detik</h2>
   <figure class="ill"><svg aria-describedby="cap-tanda-01" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Saat menarik napas, dada normal di kiri bergerak keluar, sedangkan dada bawah anak di kanan tertarik ke dalam." class="ill-tanda01">
@@ -2576,30 +2580,30 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <tbody>
         <tr><td>Di bawah 2 bulan</td><td>60 kali atau lebih per menit</td></tr>
         <tr><td>2–11 bulan</td><td>50 kali atau lebih per menit</td></tr>
-        <tr><td>12–59 bulan (1 sampai belum 5 tahun)</td><td>40 kali atau lebih per menit</td></tr>
+        <tr><td>12–59 bulan (umur 1–4 tahun)</td><td>40 kali atau lebih per menit</td></tr>
       </tbody>
     </table></div>
     <div class="box">
       <label for="nt-age">Umur anak
-        <select id="nt-age"><option value="" selected>Pilih umur anak dulu</option><option value="60">Di bawah 2 bulan</option><option value="50">2–11 bulan</option><option value="40">12–59 bulan (1 sampai belum 5 tahun)</option></select>
+        <select id="nt-age"><option value="" selected>Pilih umur anak dulu</option><option value="60">Di bawah 2 bulan</option><option value="50">2–11 bulan</option><option value="40">12–59 bulan (umur 1–4 tahun)</option></select>
       </label>
       <div class="row"><button class="btn" id="nt-start">Mulai hitung 60 detik</button><span class="bpm" id="nt-time">60</span></div>
       <button class="pad" id="nt-pad" type="button" hidden aria-label="Ketuk setiap kali dada atau perut anak naik"><span><span class="big" id="nt-taps">0</span><br>ketuk setiap kali dada atau perut naik</span></button>
-      <p class="muted">Mata tetap ke anak: ketuk lingkaran setiap kali dada atau perut naik, angkanya terisi sendiri setelah 60 detik; selama itu kotak angka dikunci. Menghitung sendiri tanpa ketuk? Hitung 60 detik penuh, lalu ketik angkanya.</p>
+      <p class="muted">Pandangan tetap ke anak. Ketuk lingkaran setiap kali dada atau perut naik; setelah 60 detik angkanya terisi sendiri. Mau menghitung sendiri tanpa mengetuk? Hitung 60 detik penuh, lalu ketik angkanya.</p>
       <label for="nt-count">Jumlah napas dalam 60 detik<input id="nt-count" type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="150"></label>
       <div class="row"><button class="btn ghost" id="nt-check">Lihat hasil</button></div>
       <p class="fb" id="nt-fb" aria-live="polite"></p>
     </div>
   </div>
-  <p class="muted">Alat ini membantu memutuskan mengantar ke Puskesmas. Alat ini tidak bisa menyatakan anak sehat.</p>
+  <p class="muted">Alat ini hanya membantu memutuskan perlu tidaknya ke Puskesmas. Hasilnya tidak bisa memastikan anak sehat.</p>
 </section>
 
-<section class="slide" data-key="tanda-02" hidden data-say="Malaria. Di Momiwaren, setiap demam diperiksa darahnya hari itu juga, terutama balita dan ibu hamil. Berangkat sekarang bila demam disertai kejang, sangat lemas atau sulit dibangunkan, sesak, sangat pucat, kencing gelap seperti teh, kuning, atau muntah terus. Tidur di dalam kelambu setiap malam. Obat malaria diminum sampai habis walau badan sudah enak.">
+<section class="slide" data-key="tanda-02" hidden data-say="Malaria. Di Momiwaren, siapa pun yang demam diperiksa darahnya hari itu juga, terutama balita dan ibu hamil. Berangkat sekarang bila demam disertai kejang, sangat lemas atau sulit dibangunkan, sesak, sangat pucat, kencing gelap seperti teh, kuning, atau muntah terus. Tidur di dalam kelambu setiap malam. Obat malaria diminum sampai habis walau badan sudah enak.">
   <p class="eyebrow">Malaria</p>
   <h2>Demam? Periksa darah hari itu juga</h2>
-  <p class="lead">Di Momiwaren, <b>setiap demam</b> diperiksa darahnya di Puskesmas atau bidan hari itu juga, terutama pada balita dan ibu hamil.</p>
+  <p class="lead">Di Momiwaren, <b>siapa pun yang demam</b> diperiksa darahnya di Puskesmas atau bidan hari itu juga, terutama pada balita dan ibu hamil.</p>
   <div class="box stop"><h3>Berangkat sekarang bila demam disertai</h3>
-    <ol class="list"><li>Kejang</li><li>Sangat lemas, tidak bisa duduk atau berdiri, sulit dibangunkan</li><li>Sesak napas</li><li>Sangat pucat, terlihat di telapak tangan</li><li>Kencing gelap seperti teh</li><li>Mata atau kulit kuning</li><li>Muntah terus, tidak bisa minum</li></ol></div>
+    <ol class="list"><li>Kejang</li><li>Sangat lemas, tidak bisa duduk atau berdiri, atau sulit dibangunkan</li><li>Sesak napas</li><li>Sangat pucat, terlihat di telapak tangan</li><li>Kencing gelap seperti teh</li><li>Mata atau kulit kuning</li><li>Muntah terus, tidak bisa minum</li></ol></div>
   <div class="grid2">
     <div class="box"><h3>Mencegah</h3>
       <ol class="list"><li>Tidur di dalam kelambu setiap malam, terutama ibu hamil dan anak.</li><li>Kelambu robek? Jahit atau minta ganti ke Puskesmas.</li></ol></div>
@@ -2609,7 +2613,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   <div class="box quiz" data-id="malaria">
     <p class="q">Anak 3 tahun demam sejak tadi malam, tetapi masih mau main.</p>
     <div class="pair">
-      <button class="opt" data-ok="1" data-fb="Benar. Di daerah malaria, setiap demam diperiksa darahnya hari itu.">Periksa darah hari ini</button>
+      <button class="opt" data-ok="1" data-fb="Benar. Di daerah malaria, siapa pun yang demam diperiksa darahnya hari itu.">Periksa darah hari ini</button>
       <button class="opt" data-ok="0" data-fb="Malaria pada anak bisa memburuk cepat. Periksa darah hari ini walau anak masih main.">Tunggu dua hari</button>
     </div>
     <p class="fb" aria-live="polite"></p>
@@ -2645,7 +2649,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 <circle cx="244" cy="106" r="4" fill="currentColor"/><circle cx="288" cy="106" r="4" fill="currentColor"/>
 <path d="M234 88q-12 7-12 20q0 22 22 24q19-2 20-23q-1-15-13-21M281 88q-13 7-14 21q1 21 21 23q21-2 21-24q-1-13-12-20" opacity=".4"/>
 <path d="M244 151v-12m-4 4 4-4 4 4M288 151v-12m-4 4 4-4 4 4" stroke="var(--pulse,#C3122D)"/>
-</g></svg><figcaption id="cap-tanda-03">Kiri: satu bungkus oralit dilarutkan dengan air matang sesuai takaran di kemasan. Tengah: cubitan kulit perut, dilepas lalu dilihat berapa lama kembali. Kanan: mata cekung. Mata cekung bersama cubitan yang kembali sangat lambat (lebih dari 2 detik), atau anak sangat lemas: berangkat sekarang. Mata cekung atau cubitan lambat tanpa tanda gawat: periksa hari ini.</figcaption></figure>
+</g></svg><figcaption id="cap-tanda-03">Kiri: satu bungkus oralit dilarutkan dengan air matang sesuai takaran di kemasan. Tengah: kulit perut dicubit lalu dilepas; lihat berapa cepat kulitnya kembali. Kanan: mata cekung. Mata cekung bersama kulit perut yang kembali sangat lambat setelah dicubit (lebih dari 2 detik), atau anak sangat lemas: berangkat sekarang. Mata cekung, atau kulit yang lambat kembali, tanpa tanda gawat: periksa hari ini.</figcaption></figure>
   <div class="box"><h3>Di rumah</h3>
     <ol class="list">
       <li>Teruskan ASI dan makan seperti biasa.</li>
@@ -2655,15 +2659,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       <li>Cuci tangan pakai sabun; minum air yang sudah dimasak.</li>
     </ol></div>
   <div class="box stop"><h3>Berangkat sekarang bila</h3>
-    <ol class="list"><li>Sangat lemas, sulit dibangunkan</li><li>Tidak bisa minum, atau memuntahkan semua</li><li>Mata cekung <b>dan</b> cubitan kulit perut kembali sangat lambat, lebih dari 2 detik (dua tanda bersama)</li></ol></div>
+    <ol class="list"><li>Sangat lemas atau sulit dibangunkan</li><li>Tidak bisa minum, atau memuntahkan semua</li><li>Mata cekung <b>dan</b> cubitan kulit perut kembali sangat lambat, lebih dari 2 detik (keduanya ada)</li></ol></div>
   <div class="box key"><h3>Periksa hari ini bila</h3>
     <ol class="list"><li>Mata cekung, atau cubitan kulit perut kembali lambat, tanpa tanda gawat di atas</li><li>Ada darah di tinja</li><li>Diare 2 minggu atau lebih</li></ol></div>
   <p class="muted">Oralit dan zinc tersedia gratis di posyandu, bidan, atau Puskesmas. Simpan beberapa bungkus oralit di rumah.</p>
 </section>
 
-<section class="slide" data-key="tanda-04" hidden data-say="Digigit ular. Jauhi ularnya. Tenangkan korban dan jangan biarkan dia berjalan, gotong ke kendaraan. Pasang bidai supaya bagian yang digigit tidak bergerak. Jangan ikat kencang, jangan sayat, jangan isap, jangan pijat. Berangkat sekarang ke Puskesmas, walau belum ada keluhan. Kelopak mata turun, sulit menelan, atau napas melemah berarti sangat gawat. Napas melemah: bantu napas buatan di perjalanan bila dilatih, atau ikuti arahan petugas lewat telepon. Tidak sadar dan tidak bernapas normal? Tekan dada, dan beri napas buatan bila dilatih.">
+<section class="slide" data-key="tanda-04" hidden data-say="Digigit ular. Jauhi ularnya. Tenangkan korban dan jangan biarkan dia berjalan, gotong ke kendaraan. Pasang bidai supaya bagian yang digigit tidak bergerak. Jangan ikat kencang, jangan sayat, jangan isap, jangan pijat. Berangkat sekarang ke Puskesmas, walau belum ada keluhan. Kelopak mata turun, sulit menelan, atau napas melemah berarti sangat gawat. Napas melemah: bantu napas buatan di perjalanan bila sudah terlatih, atau ikuti arahan petugas lewat telepon. Tidak sadar dan tidak bernapas normal? Tekan dada, dan beri napas buatan bila sudah terlatih.">
   <p class="eyebrow">Gigitan ular</p>
-  <h2>Digigit ular: diam, bidai, gotong</h2>
+  <h2>Digigit ular: jangan berjalan, pasang bidai, gotong</h2>
   <figure class="ill"><svg aria-describedby="cap-tanda-04" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="Tungkai yang digigit ular ditopang bidai dan korban digotong; jangan memasang ikatan kencang, menyayat, atau mengisap luka." class="ill-tanda04">
 <g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 <path d="M20 38h88q10 0 10 12v23l19 12q9 5 5 12H99l-9-17H20" fill="var(--pulse-soft,#FBE5E8)"/>
@@ -2698,7 +2702,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
         <li>Jauhi ularnya. Jangan mencoba menangkap atau membunuh.</li>
         <li>Tenangkan korban. <b>Jangan biarkan berjalan</b>: gotong ke kendaraan.</li>
         <li>Lepas cincin, gelang, atau sepatu di bagian yang digigit.</li>
-        <li>Pasang bidai dari kayu atau bambu supaya tidak bergerak.</li>
+        <li>Pasang bidai dari kayu atau bambu supaya bagian yang digigit tidak bergerak.</li>
         <li><b>Berangkat sekarang</b> ke Puskesmas, walau belum ada keluhan.</li>
       </ol></div>
     <div class="box key"><h3>Jangan</h3>
@@ -2709,7 +2713,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
         <li>Menunggu sampai lemas atau sesak</li>
       </ol></div>
   </div>
-  <p class="box tip">Bisa ular di Papua bisa melumpuhkan otot napas. Kelopak mata turun, sulit menelan, atau napas melemah berarti sangat gawat: berangkat sekarang. Napas melemah: bantu napas buatan di perjalanan bila kamu dilatih, atau ikuti arahan petugas lewat telepon. Tidak sadar dan tidak bernapas normal: tekan dada, dan napas buatan bila dilatih (Modul 1).</p>
+  <p class="box tip">Racun (bisa) ular di Papua dapat melumpuhkan otot napas. Kelopak mata turun, sulit menelan, atau napas melemah berarti sangat gawat: berangkat sekarang. Napas melemah: bantu napas buatan di perjalanan bila kamu sudah terlatih, atau ikuti arahan petugas lewat telepon. Tidak sadar dan tidak bernapas normal: tekan dada, dan napas buatan bila sudah terlatih (Modul 1).</p>
 </section>
 
 <section class="slide" data-key="tanda-05" hidden data-say="Nomor penting. Seratus dua belas untuk panggilan darurat, seratus sembilan belas untuk gawat darurat kesehatan, nomor jaga Puskesmas, seratus dua puluh sembilan untuk pengaduan kekerasan, dan seratus sembilan belas tekan delapan untuk dukungan kesehatan jiwa. Tidak ada sinyal? Kirim orang ke Puskesmas atau rumah bidan, dan siapkan kendaraan kampung.">
@@ -2770,38 +2774,38 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
      why = penjelasan yang muncul setelah menjawab di tes akhir, ref = data-key layar materinya. Perlu ditinjau tenaga kesehatan bersama isi modul. -->
 <script type="application/json" id="tes-data">
 {"bls":[
- {"q":"Seorang bapa dewasa tiba-tiba jatuh. Bahunya sudah ditepuk dan dipanggil keras, tetapi ia tidak menjawab dan tidak bergerak. Apa yang dilakukan sekarang?","o":["Beri minum air hangat dulu supaya ia cepat sadar","Segera panggil bantuan, pakai pengeras suara","Tunggu beberapa menit dulu, siapa tahu bangun sendiri"],"a":1,"why":"Orang yang tidak sadar perlu bantuan secepatnya. Telepon dengan pengeras suara supaya tangan tetap bebas, sambil memeriksa napasnya. Jangan beri minum: orang yang tidak sadar bisa tersedak.","ref":"bls-04"},
+ {"q":"Seorang bapa dewasa tiba-tiba jatuh. Bahunya sudah ditepuk dan dipanggil keras, tetapi ia tidak menjawab dan tidak bergerak. Apa yang dilakukan sekarang?","o":["Beri minum air hangat dulu supaya ia cepat sadar","Segera telepon minta bantuan, nyalakan speaker HP","Tunggu beberapa menit dulu, siapa tahu bangun sendiri"],"a":1,"why":"Orang yang tidak sadar perlu bantuan secepatnya. Telepon dengan speaker HP menyala supaya tangan tetap bebas, sambil memeriksa napasnya. Jangan beri minum: orang yang tidak sadar bisa tersedak.","ref":"bls-04"},
  {"q":"Bapa dewasa tidak merespons saat ditepuk dan dipanggil. Napasnya megap-megap, satu-satu, seperti ikan di darat. Apa artinya?","o":["Bukan napas normal: segera panggil bantuan dan mulai tekan dada","Masih bernapas: baringkan miring lalu tunggu bantuan datang","Sedang tidur nyenyak: biarkan saja sampai ia bangun sendiri"],"a":0,"why":"Pada orang yang tidak merespons, napas megap-megap bukan napas normal; itu tanda jantung berhenti. Panggil bantuan dan mulai tekan dada. Kalau ragu, anggap tidak normal. Orang yang sadar tetapi sesak tidak ditekan dadanya; antar ke Puskesmas sekarang.","ref":"bls-05"},
  {"q":"Orang dewasa tidak sadar dan tidak bernapas normal. Tekan dada seberapa dalam dan secepat apa?","o":["Sedalam 1–2 cm, 60 kali per menit","Sedalam 8–10 cm, sekitar 150 kali per menit","Sedalam 5–6 cm, 100–120 kali per menit"],"a":2,"why":"Tekan di tengah dada sedalam 5–6 cm, 100–120 kali per menit, dan biarkan dada naik penuh setelah setiap tekanan. Jangan berhenti lama.","ref":"bls-06"},
- {"q":"Bayi 6 bulan tidak sadar dan tidak bernapas normal. Cara menekan dada yang dianjurkan pedoman terbaru adalah…","o":["Dua jari di tengah dada, sedalam 1–2 cm","Dua ibu jari melingkari dada, sedalam sepertiga dada","Dua tangan bertumpuk di dada, seperti orang dewasa"],"a":1,"why":"Lingkari dada bayi dengan kedua tangan, dua ibu jari berdampingan di tengah dada, lalu tekan sepertiga tebal dada. Tangan tidak bisa melingkari dada? Pakai pangkal satu tangan. Teknik dua jari tidak lagi dianjurkan karena sering kurang dalam. Kecepatannya sama, 100–120 per menit.","ref":"bls-11"},
- {"q":"Anak ditarik dari kali, tidak merespons, dan tidak bernapas. Bantuan sudah dipanggil, dan kamu sudah dilatih napas buatan di pelatihan kader. Apa yang dilakukan?","o":["Gantung terbalik dulu supaya airnya keluar","Tekan perutnya kuat-kuat dulu, lalu periksa napasnya dengan teliti","5 napas buatan, lalu tekan dada dan napas 30:2"],"a":2,"why":"Orang tenggelam kehabisan udara, jadi napas buatan didahulukan: 5 napas, lalu 30 tekanan dan 2 napas, sesuai pelatihan kader. Jangan buang waktu mengeluarkan air: jangan digantung terbalik, diguncang, atau ditekan perutnya. Belum dilatih napas buatan? Tekan dada terus.","ref":"bls-12"}
+ {"q":"Bayi 6 bulan tidak sadar dan tidak bernapas normal. Cara menekan dada yang dianjurkan pedoman terbaru adalah…","o":["Dua jari di tengah dada, sedalam 1–2 cm","Tangan melingkari dada, dua ibu jari menekan sepertiga dada","Dua tangan bertumpuk di dada, seperti orang dewasa"],"a":1,"why":"Lingkari dada bayi dengan kedua tangan, dua ibu jari berdampingan di tengah dada, lalu tekan sepertiga tebal dada. Tangan tidak bisa melingkari dada? Pakai pangkal satu tangan. Teknik dua jari tidak lagi dianjurkan karena sering kurang dalam. Kecepatannya sama, 100–120 per menit.","ref":"bls-11"},
+ {"q":"Anak ditarik dari kali, tidak merespons, dan tidak bernapas. Bantuan sudah dipanggil, dan kamu pernah belajar napas buatan di pelatihan kader. Apa yang dilakukan?","o":["Gantung terbalik dulu supaya airnya keluar","Tekan perutnya kuat-kuat dulu untuk mengeluarkan air","Beri 5 napas buatan dulu, lalu 30 tekanan dan 2 napas"],"a":2,"why":"Orang tenggelam kehabisan udara, jadi napas buatan didahulukan: 5 napas, lalu 30 tekanan dan 2 napas, sesuai pelatihan kader. Jangan buang waktu mengeluarkan air: jangan digantung terbalik, diguncang, atau ditekan perutnya. Belum dilatih napas buatan? Tekan dada terus.","ref":"bls-12"}
 ],
 "kespro":[
- {"q":"Mama Ani baru tahu ia hamil 2 bulan. Kapan sebaiknya ia mulai periksa ke bidan?","o":["Sekarang juga, sejak awal kehamilannya","Nanti, saat perutnya mulai kelihatan","Menjelang melahirkan, cukup sekali saja"],"a":0,"why":"Periksa ke bidan sejak awal, minimal 6 kali selama hamil, dua kali di antaranya dengan dokter. Kalau ibu ingin kehamilannya tetap tertutup, kader bicara empat mata dan tidak mengumumkannya.","ref":"kespro-01"},
- {"q":"Bagaimana ibu hamil minum tablet tambah darah?","o":["Satu tablet saat pusing atau lemas saja","Satu tablet seminggu sekali selama hamil","Satu tablet setiap hari, minimal 90 tablet"],"a":2,"why":"Satu tablet setiap hari selama hamil, minimal 90 tablet. Kalau mual, minum malam sebelum tidur dengan air putih, jangan dengan teh atau kopi. Jangan berhenti diam-diam; ceritakan ke bidan.","ref":"kespro-03"},
- {"q":"Ibu hamil 7 bulan sakit kepala sangat hebat sejak pagi. Wajah dan tangannya tidak bengkak. Apa yang dilakukan kader?","o":["Suruh istirahat dan minum obat sakit kepala dulu","Panggil bantuan dan berangkat sekarang","Ke bidan besok pagi kalau belum juga membaik"],"a":1,"why":"Sakit kepala hebat atau pandangan kabur adalah tanda bahaya yang bisa berujung kejang, walau tanpa bengkak. Berangkat sekarang, jangan tunggu besok; berdoa dan berembuk bisa sambil jalan.","ref":"kespro-04"},
- {"q":"Apa yang perlu disepakati keluarga dalam rencana persalinan (P4K)?","o":["Ramuan, silet bersih, dan dukun untuk di rumah","Penolong, tempat, kendaraan, dan calon donor darah","Cukup tanggal perkiraan lahir dan pakaian bayi"],"a":1,"why":"Rencana persalinan (P4K) disepakati jauh sebelum waktunya: penolong, tempat, pendamping, kendaraan dan sopir (juga malam hari), calon donor darah, dan biaya atau JKN. Ditulis di stiker; ibu dan keluarga yang menentukan isinya dan tempat menempelnya.","ref":"kespro-05"},
- {"q":"Bagaimana merawat tali pusat bayi baru lahir?","o":["Jaga bersih dan kering, jangan diberi apa pun","Olesi ramuan atau abu dapur agar cepat lepas","Tutup rapat dengan kain basah supaya tidak kering"],"a":0,"why":"Tali pusat dijaga bersih dan kering tanpa diberi apa pun. Tali pusat merah, bernanah, atau berbau: ke bidan hari ini. Bayi tidak mau menyusu, lemas, kejang, atau sesak: berangkat sekarang.","ref":"kespro-07"}
+ {"q":"Mama Ani baru tahu ia hamil 2 bulan. Kapan sebaiknya ia mulai periksa ke bidan?","o":["Sekarang juga, sejak awal kehamilannya","Nanti, saat perutnya mulai kelihatan","Menjelang melahirkan, cukup sekali saja"],"a":0,"why":"Periksa ke bidan sejak awal, minimal 6 kali selama hamil, dua kali di antaranya dengan dokter. Kalau ibu belum ingin orang lain tahu kehamilannya, kader bicara empat mata dan tidak mengumumkannya.","ref":"kespro-01"},
+ {"q":"Bagaimana ibu hamil minum tablet tambah darah?","o":["Satu tablet saat pusing atau lemas saja","Satu tablet seminggu sekali selama hamil","Satu tablet setiap hari, minimal 90 tablet"],"a":2,"why":"Satu tablet setiap hari selama hamil, minimal 90 tablet. Kalau mual, minum malam sebelum tidur dengan air putih, jangan dengan teh atau kopi. Kalau ingin berhenti karena mual atau keluhan lain, bicarakan dulu dengan bidan.","ref":"kespro-03"},
+ {"q":"Ibu hamil 7 bulan sakit kepala sangat hebat sejak pagi. Wajah dan tangannya tidak bengkak. Apa yang dilakukan kader?","o":["Suruh istirahat dan minum obat sakit kepala dulu","Panggil bantuan dan berangkat sekarang","Ke bidan besok pagi kalau belum juga membaik"],"a":1,"why":"Sakit kepala hebat atau pandangan kabur pada ibu hamil adalah tanda bahaya yang bisa berujung kejang, walaupun tidak ada bengkak. Berangkat sekarang, jangan tunggu besok; berdoa dan berembuk bisa sambil jalan.","ref":"kespro-04"},
+ {"q":"Apa yang perlu disepakati keluarga dalam rencana persalinan (P4K)?","o":["Ramuan, silet, dan dukun beranak di rumah","Penolong, tempat, kendaraan, dan calon donor darah","Cukup tanggal perkiraan lahir dan pakaian bayi"],"a":1,"why":"Rencana persalinan (P4K) disepakati jauh sebelum waktunya: penolong, tempat, pendamping, kendaraan dan sopir (juga malam hari), calon donor darah, dan biaya atau JKN. Ditulis di stiker; ibu dan keluarga yang menentukan isinya dan tempat menempelnya.","ref":"kespro-05"},
+ {"q":"Bagaimana merawat tali pusat bayi baru lahir?","o":["Jaga bersih dan kering, jangan diberi apa pun","Olesi ramuan atau abu dapur agar cepat lepas","Bungkus rapat dengan gurita atau kain tebal"],"a":0,"why":"Tali pusat dijaga bersih dan kering tanpa diberi apa pun. Tali pusat merah, bernanah, atau berbau: ke bidan hari ini. Bayi tidak mau menyusu, lemas, kejang, atau sesak: berangkat sekarang.","ref":"kespro-07"}
 ],
 "kulit":[
- {"q":"Tanda kusta yang perlu diajak periksa ke Puskesmas adalah…","o":["Jerawat merah di wajah yang kadang terasa nyeri","Bercak putih atau kemerahan yang terasa kebas","Bentol gatal yang muncul setelah digigit nyamuk"],"a":1,"why":"Bercak putih atau kemerahan yang terasa kebas (mati rasa) perlu diperiksa. Biasanya tidak gatal dan tidak sakit, tetapi bercak yang gatal pun tetap boleh diajak periksa. Kader tidak menguji rasa dengan jarum atau kapas. Kusta bisa sembuh dengan obat gratis; ditemukan lebih awal berarti cacat bisa dicegah.","ref":"kulit-01"},
+ {"q":"Tanda mana yang perlu diperiksakan ke Puskesmas karena bisa jadi kusta?","o":["Jerawat merah di wajah yang terasa nyeri","Bercak putih atau kemerahan yang terasa kebas","Bentol gatal bekas gigitan nyamuk"],"a":1,"why":"Bercak putih atau kemerahan yang terasa kebas (mati rasa) perlu diperiksa. Biasanya tidak gatal dan tidak sakit, tetapi orang dengan bercak yang gatal pun tetap boleh diajak periksa. Kader tidak menguji rasa dengan jarum atau kapas. Kusta bisa sembuh dengan obat gratis; makin cepat ditemukan, makin besar peluang mencegah cacat.","ref":"kulit-01"},
  {"q":"Kaskado, sisik berlapis yang melingkar seperti ukiran, disebabkan oleh…","o":["Jamur yang menular lewat kulit dan barang bersama","Kutukan atau guna-guna dari orang yang iri","Keturunan dari orang tua, jadi tidak bisa diobati"],"a":0,"why":"Kaskado disebabkan jamur, bukan kutukan dan bukan keturunan. Obat jamur dari Puskesmas sering harus diminum berminggu-minggu sampai tuntas, walau gatalnya sudah berkurang.","ref":"kulit-04"},
- {"q":"Kader melihat bercak mencurigakan di lengan seorang warga. Apa yang sebaiknya dilakukan?","o":["Foto bercaknya dan kirim ke grup kader minta pendapat","Tusuk bercaknya pelan dengan jarum untuk menguji rasa","Bicara empat mata dan tawarkan menemani ke Puskesmas"],"a":2,"why":"Kader tidak menguji bercak dan tidak menebak nama penyakit. Bicara empat mata, jangan menyebutnya di depan orang banyak atau membagikan fotonya tanpa izin, lalu ajak periksa. Petugas Puskesmas yang memeriksa.","ref":"kulit-03"},
- {"q":"Satu keluarga gatal hebat setiap malam, ada bintil di sela jari. Apa yang dianjurkan?","o":["Obati yang paling gatal dulu, lainnya menunggu","Pakai obat sisa tetangga bergantian untuk semua orang","Semua periksa ke Puskesmas dan diobati bersamaan"],"a":2,"why":"Gejala ini mengarah ke kudis; petugas yang memastikan dan memilih obat serta cara pakainya, termasuk untuk bayi dan ibu hamil. Seluruh orang serumah diobati bersamaan. Pakaian, sprei, dan tikar dicuci dan dijemur; barang yang tidak bisa dicuci dibungkus plastik rapat selama 3 hari.","ref":"kulit-05"},
- {"q":"Adik punya benjolan atau luka di kaki yang tidak sembuh-sembuh dan tidak sakit. Apa yang dilakukan?","o":["Ajak ke Puskesmas walau tidak terasa sakit","Tunggu saja sampai terasa sakit, baru diperiksa","Tutup dengan daun dan kain setiap hari di rumah"],"a":0,"why":"Benjolan atau luka yang menetap pada anak perlu diperiksa, walau tidak sakit dan tidak persis seperti 'buah arbei'. Bisa frambusia, yang menular lewat sentuhan dengan luka dan bisa disembuhkan dengan obat. Petugas yang menentukan siapa lagi yang perlu diperiksa.","ref":"kulit-06"}
+ {"q":"Kader melihat bercak mencurigakan di lengan seorang warga. Apa yang sebaiknya dilakukan?","o":["Foto bercaknya dan kirim ke grup kader minta pendapat","Tusuk bercaknya pelan dengan jarum untuk menguji rasa","Bicara empat mata dan tawarkan menemani ke Puskesmas"],"a":2,"why":"Kader tidak menguji bercak dan tidak menebak nama penyakit. Bicara empat mata, jangan menyebutnya di depan orang banyak atau membagikan fotonya tanpa izin, lalu ajak periksa. Pemeriksaan dilakukan petugas Puskesmas.","ref":"kulit-03"},
+ {"q":"Satu keluarga gatal hebat setiap malam, ada bintil di sela jari. Apa yang dianjurkan?","o":["Obati yang paling gatal dulu, yang lain menyusul","Pakai obat sisa tetangga bergantian untuk semua orang","Semua periksa ke Puskesmas dan diobati bersamaan"],"a":2,"why":"Gejala ini mengarah ke kudis; petugas yang memastikan dan memilih obat serta cara pakainya, termasuk untuk bayi dan ibu hamil. Seluruh orang serumah diobati bersamaan. Pakaian, sprei, dan tikar dicuci dan dijemur; barang yang tidak bisa dicuci dibungkus plastik rapat selama 3 hari.","ref":"kulit-05"},
+ {"q":"Adik punya benjolan atau luka di kaki yang tidak sembuh-sembuh dan tidak sakit. Apa yang dilakukan?","o":["Ajak ke Puskesmas walau tidak terasa sakit","Tunggu saja sampai terasa sakit, baru diperiksa","Tutup dengan daun dan kain setiap hari di rumah"],"a":0,"why":"Benjolan atau luka yang menetap pada anak perlu diperiksa, walau tidak sakit dan tidak persis seperti 'buah arbei'. Bisa frambusia, yang menular lewat sentuhan dengan luka dan bisa disembuhkan dengan obat. Petugas akan menentukan siapa lagi yang perlu diperiksa.","ref":"kulit-06"}
 ],
 "gizi":[
  {"q":"Sampai umur berapa bayi cukup diberi ASI saja, tanpa air, madu, pisang, atau bubur?","o":["2 bulan","6 bulan","1 tahun"],"a":1,"why":"ASI saja sampai 6 bulan, sesering bayi mau, siang dan malam. Setelah itu mulai makanan pendamping, dan ASI dilanjutkan sampai 2 tahun atau lebih.","ref":"gizi-01"},
- {"q":"Adik umur 9 bulan. Makanan pendamping mana yang paling baik?","o":["Bubur nasi atau papeda saja, tiga kali sehari","Biskuit bayi dan teh manis, sesering ia mau","Bubur cincang dengan ikan atau telur dan sayur"],"a":2,"why":"Mulai 6 bulan anak perlu lauk hewani setiap hari: ikan, telur, ayam, atau hati. Makanan pokok saja tidak cukup untuk tumbuh; tambahkan lauk dan sayur hijau.","ref":"gizi-02"},
+ {"q":"Adik umur 9 bulan. Makanan pendamping mana yang paling baik?","o":["Bubur nasi atau papeda saja, tiga kali sehari","Biskuit bayi dan teh manis, sesering ia mau","Bubur dengan ikan atau telur dan sayur cincang"],"a":2,"why":"Mulai 6 bulan anak perlu lauk hewani setiap hari: ikan, telur, ayam, atau hati. Makanan pokok saja tidak cukup untuk tumbuh; tambahkan lauk dan sayur hijau.","ref":"gizi-02"},
  {"q":"Anak 2 tahun sangat kurus dan kedua kakinya bengkak. Ia masih sadar dan mau minum. Apa yang dilakukan?","o":["Bawa anak ke Puskesmas hari ini juga","Tunggu penimbangan di posyandu bulan depan","Beri susu kental manis agar gemuk"],"a":0,"why":"Kaki bengkak atau sangat kurus bisa tanda gizi buruk: antar ke Puskesmas hari ini. Bila anak sangat lemas, sulit dibangunkan, atau tidak bisa minum: berangkat sekarang. Berat yang hanya tidak naik dibicarakan dengan bidan atau petugas gizi di posyandu.","ref":"gizi-04"},
- {"q":"Adik 18 bulan, giginya sudah tumbuh. Berapa banyak pasta gigi berfluoride untuk sekali sikat?","o":["Tidak perlu pasta, air saja","Olesan tipis sebesar butir beras","Sepanjang bulu sikat, seperti orang dewasa"],"a":1,"why":"Di bawah 3 tahun: olesan tipis sebesar butir beras. Umur 3–6 tahun: sebesar kacang polong. Orang tua yang menyikatkan; anak cukup meludahkan busa, belum perlu berkumur. Sikat pagi setelah sarapan dan malam sebelum tidur.","ref":"gizi-06"},
- {"q":"Mana yang benar tentang pinang?","o":["Pinang sendiri bisa menyebabkan kanker mulut","Pinang aman untuk anak bila hanya sedikit","Pinang dengan kapur justru menguatkan gigi"],"a":0,"why":"Pinang adalah adat yang dihormati, tetapi pinang sendiri, tanpa tembakau pun, bisa menyebabkan kanker mulut. Tembakau menambah bahayanya, dan kapur bisa melukai mulut. Jangan beri pada anak. Luka di mulut yang tidak sembuh 2 minggu: periksa ke Puskesmas.","ref":"gizi-08"}
+ {"q":"Adik 18 bulan, giginya sudah tumbuh. Berapa banyak pasta gigi berfluoride untuk sekali sikat?","o":["Tidak perlu pasta, air saja","Olesan tipis sebesar butir beras","Sepanjang bulu sikat, seperti orang dewasa"],"a":1,"why":"Di bawah 3 tahun: olesan tipis sebesar butir beras. Umur 3–6 tahun: sebesar kacang polong. Gigi anak disikatkan orang tua; anak cukup meludahkan busa, belum perlu berkumur. Sikat pagi setelah sarapan dan malam sebelum tidur.","ref":"gizi-06"},
+ {"q":"Mana yang benar tentang pinang?","o":["Pinang tanpa tembakau pun bisa menyebabkan kanker mulut","Pinang aman untuk anak bila hanya sedikit","Pinang dengan kapur justru menguatkan gigi"],"a":0,"why":"Pinang adalah adat yang dihormati, tetapi pinang saja, tanpa tembakau pun, bisa menyebabkan kanker mulut. Tembakau menambah bahayanya, dan kapur bisa melukai mulut. Jangan beri pada anak. Luka di mulut yang tidak sembuh 2 minggu: periksa ke Puskesmas.","ref":"gizi-08"}
 ],
 "remaja":[
  {"q":"Remaja putri yang sedang haid sebaiknya…","o":["Tidak mandi dan keramas sampai haid selesai","Tetap mandi, keramas, dan ganti pembalut teratur","Tinggal di rumah dan tidak pergi ke sekolah"],"a":1,"why":"Haid adalah proses tubuh yang normal dan tidak memalukan. Tetap mandi dan keramas, ganti pembalut beberapa kali sehari, dan cuci tangan. Nyeri ringan wajar; nyeri hebat atau haid sangat banyak: ke bidan. Haid sangat banyak disertai lemas berat, pusing hebat, atau pingsan: berangkat sekarang.","ref":"remaja-02"},
- {"q":"Pacar memaksa berhubungan seks dan mengancam menyebarkan foto. Ini tanda…","o":["Kekerasan: kamu boleh menolak dan minta tolong","Rasa sayang yang besar karena takut kehilangan","Hal yang wajar kalau sudah lama berpacaran"],"a":0,"why":"Tidak berarti tidak. Dipaksa, dibujuk dengan uang atau pulsa, atau diancam fotonya disebar adalah kekerasan. Jangan membagikan ulang foto itu. Ceritakan pada orang dewasa yang dipercaya, atau hubungi SAPA 129.","ref":"remaja-03"},
- {"q":"Setelah mengalami kekerasan seksual, kapan sebaiknya datang ke Puskesmas?","o":["Tunggu sampai ada rasa sakit","Tunggu beberapa hari sampai siap bercerita","Sekarang juga, makin cepat makin baik"],"a":2,"why":"Datang sekarang. Obat pencegah HIV makin cepat makin baik, paling lambat 3 hari (72 jam); pencegah kehamilan sampai 5 hari. Lewat dari itu tetap datang: pemeriksaan, pengobatan, dan pendampingan tetap perlu. Kekerasan seksual tidak pernah salah korban.","ref":"remaja-04"},
- {"q":"Lewat apa HIV bisa menular?","o":["Makan sepiring bersama atau berbagi gelas minum","Seks tanpa kondom atau jarum suntik bergantian","Gigitan nyamuk atau bersalaman dengan orang lain"],"a":1,"why":"HIV menular lewat seks tanpa kondom; jarum suntik, alat tato, atau alat tindik yang tidak steril dan dipakai bergantian; dan dari ibu ke bayi. Tidak menular lewat bersalaman, makan bersama, atau nyamuk. Tes HIV di Puskesmas gratis dan rahasia; tes yang terlalu cepat sesudah berisiko bisa masih negatif, jadi ikuti saran petugas kapan tes diulang.","ref":"remaja-07"},
+ {"q":"Pacar memaksa berhubungan seks dan mengancam menyebarkan foto. Ini tanda…","o":["Kekerasan: kamu boleh menolak dan minta tolong","Tanda pacar sangat sayang dan takut kehilangan","Hal yang wajar kalau sudah lama berpacaran"],"a":0,"why":"Kalau seseorang bilang tidak, artinya ia tidak setuju. Dipaksa, dibujuk dengan uang atau pulsa, atau diancam fotonya disebar adalah kekerasan. Jangan membagikan ulang foto itu. Ceritakan pada orang dewasa yang dipercaya, atau hubungi SAPA 129.","ref":"remaja-03"},
+ {"q":"Setelah mengalami kekerasan seksual, kapan sebaiknya datang ke Puskesmas?","o":["Tunggu sampai ada rasa sakit","Tunggu beberapa hari sampai siap bercerita","Sekarang juga, makin cepat makin baik"],"a":2,"why":"Datang sekarang. Obat pencegah HIV makin cepat dimulai makin baik, paling lambat 3 hari (72 jam) setelah kejadian; obat pencegah kehamilan masih bisa sampai 5 hari. Lewat dari itu tetap datang: pemeriksaan, pengobatan, dan pendampingan tetap perlu. Korban kekerasan seksual tidak pernah bersalah.","ref":"remaja-04"},
+ {"q":"Lewat apa HIV bisa menular?","o":["Makan sepiring bersama atau berbagi gelas minum","Seks tanpa kondom atau jarum suntik bergantian","Gigitan nyamuk atau bersalaman dengan orang lain"],"a":1,"why":"HIV menular lewat seks tanpa kondom; jarum suntik, alat tato, atau alat tindik yang tidak steril dan dipakai bergantian; dan dari ibu ke bayi. Tidak menular lewat bersalaman, makan bersama, atau nyamuk. Tes HIV di Puskesmas gratis dan rahasia; tes yang dilakukan terlalu cepat setelah kejadian berisiko bisa saja masih negatif; ikuti saran petugas kapan perlu tes ulang.","ref":"remaja-07"},
  {"q":"Teman tampak sangat sedih dan bilang ingin mati. Apa yang kamu lakukan?","o":["Anggap bercanda, alihkan ke topik lain","Ceritakan di grup supaya teman lain membantu","Dengarkan, temani, dan ajak cari bantuan"],"a":2,"why":"Ucapan ingin mati harus ditanggapi serius. Dengarkan tanpa menghakimi, temani, lalu hubungkan dengan orang dewasa yang dipercaya, Puskesmas, atau Healing119 (telepon 119 lalu tekan 8). Sudah melukai diri, menelan racun atau obat, atau akan melakukannya sekarang: cari bantuan darurat saat itu juga.","ref":"remaja-10"}
 ]}
 </script>
@@ -2894,7 +2898,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderBoard(el){
     var fin=mainDecks.filter(finished).length;
     el.innerHTML='<div class="r"><span>'+(st.mode==='group'?'Bintang bersama sesi ini':'Bintang kamu')+'</span><span class="badge">★ '+num(st.stars)+'</span></div>'+
-      '<div class="r"><span>Modul dengan semua layar dibuka</span><span class="badge">'+fin+' dari '+mainDecks.length+'</span></div>'+
+      '<div class="r"><span>Modul yang semua layarnya sudah dibuka</span><span class="badge">'+fin+' dari '+mainDecks.length+'</span></div>'+
       (cur&&tesScore(cur,'post')?'<div class="r"><span>Tes awal → tes akhir</span><span class="badge">'+tesFmt(tesScore(cur,'pre'))+' → '+tesFmt(tesScore(cur,'post'))+'</span></div>':
        cur&&tesDone(cur,'post')?'<div class="r"><span>Tes akhir: semua soal dilewati</span></div>':
        cur&&tesIdx(cur,'post')>=0?'<div class="r"><span>Tes akhir belum dikerjakan</span><button class="btn tes-go" type="button">Kerjakan tes akhir ›</button></div>':'');
@@ -2903,7 +2907,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
 
   /* ---------- catatan sesi tanpa nama (indikator proses untuk Puskesmas) ---------- */
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{}}}
+  function newSess(){return {d:today(),kp:'',mode:st.mode||'',mods:{},fin:{},say:0,act:0,off:navigator.onLine===false?1:0,tes:{},v:'0.9.10'}}
   function used(s){return s&&(Object.keys(s.mods).length||s.say||s.act)}
   /* Satu pintu untuk mengganti sesi (ganti hari, ganti kampung, atau "Mulai sesi baru"):
      sesi lama diarsipkan bila ada kegiatannya, lalu bintang dan tanda "sudah dihitung" dimulai dari nol,
@@ -2926,7 +2930,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     var names=function(o){return Object.keys(o).map(function(m){return MODNAME[m]||m}).join(', ')||'-'};
     return s.d+' · '+(s.kp||'tempat tidak diisi')+' · '+(s.mode==='group'?'kelompok':'sendiri')+
       ' · dibuka: '+names(s.mods)+' · semua layar dibuka: '+names(s.fin)+' · Bacakan '+s.say+'x · kegiatan selesai '+s.act+
-      ' · tanpa sinyal: '+(s.off?'ya':'tidak')+tesLine(s);
+      ' · tanpa sinyal: '+(s.off?'ya':'tidak')+tesLine(s)+(s.v?' · aplikasi v'+s.v:'');
   }
   /* Hasil tes per modul untuk catatan: sendiri "benar/jumlah soal"; kelompok "persen tangan yang benar (perkiraan jumlah orang)". */
   function tesLine(s){
@@ -2934,7 +2938,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     Object.keys(o).forEach(function(m){(Array.isArray(o[m])?o[m]:[]).forEach(function(r){
       if(!r||typeof r!=='object')return;
       var f=function(x){if(!Array.isArray(x)||!num(x[1]))return '-';var b=num(x[0]),n=num(x[1]);
-        return r.m==='group'?Math.round(b/n*100)+'% tangan benar (±'+Math.round(n/Math.max(1,num(x[2])))+' org)':b+'/'+n};
+        return r.m==='group'?Math.round(b/n*100)+'% jawaban benar (±'+Math.round(n/Math.max(1,num(x[2])))+' org)':b+'/'+n};
       out.push('tes '+(MODNAME[m]||m)+': awal '+f(r.pre)+', akhir '+f(r.post));
     })});
     return out.length?' · '+out.join(' · '):'';
@@ -2965,6 +2969,12 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     }else waOpen(t);
   };
   }catch(e){fault('log-wa',e)}
+  try{ /* batas galat: log-cadang */
+  $('log-cadang').onclick=function(){
+    var t=location.origin+location.pathname+'#bawa='+bawaan();
+    try{navigator.clipboard.writeText(t).then(function(){toast('Tautan cadangan disalin. Simpan di tempat aman.')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}
+  };
+  }catch(e){fault('log-cadang',e)}
   try{ /* batas galat: log-copy */
   $('log-copy').onclick=function(){
     var t=logText();
@@ -3035,6 +3045,9 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     var dariModul=!!cur;navGen++;stopAll();
     if(cur){st.last=(st.pos[cur]||0)<slides.length-1?cur:null;var tsH=slides[num(st.pos[cur])]&&slides[num(st.pos[cur])].querySelector('.tes');if(tsH&&tsH._settle)tsH._settle()}
     decks.forEach(function(d){d.hidden=true});home.hidden=false;$('hint').hidden=true;
+    /* Tampilan saja: setelah cara belajar pernah dipilih, rak modul naik (lihat #home.siap di CSS). Tidak saat chip diketuk,
+       supaya isian tempat sesi kelompok tidak terdorong ke bawah. */
+    if(st.mode)home.classList.add('siap');
     document.documentElement.removeAttribute('data-mod');
     $('nav').hidden=true;$('home-btn').hidden=true;$('print-row').hidden=true;$('segs').hidden=true;closeMap();
     $('brand-t').textContent='Literasi Kesehatan Kader';$('brand-s').textContent='Momiwaren · prototipe TEP 7 ITS';
@@ -3127,7 +3140,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   /* Daftar suara terbaca tetapi tidak ada bahasa Indonesia: jangan membaca dengan logat asing.
      Daftar kosong (sebagian HP tidak melaporkan suaranya): tetap dicoba. */
   function ttsOk(){
-    if(!canSpeak){toast('HP ini tidak punya suara mesin. Bacakan langsung.');return false}
+    if(!canSpeak){toast('Fitur Bacakan tidak tersedia di HP ini. Kalau perlu, minta pendamping membacakan teksnya.');return false}
     if(voicesKnown()&&!idVoice()){toast('Suara bahasa Indonesia belum terpasang di HP ini. Lihat petunjuk di beranda.');return false}
     return true;
   }
@@ -3386,8 +3399,6 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     /* Ganti mode setelah ada kegiatan: sesi lama diarsipkan dengan modenya sendiri, bukan ditulis ulang. */
     if(st.sess&&st.sess.mode&&st.sess.mode!==m&&used(st.sess)){archive();toast('Catatan sesi sebelumnya disimpan')}
     st.mode=m;sess().mode=m;persist();
-    /* Tampilan saja: beranda menaikkan rak modul (lihat #home.siap di CSS). */
-    try{home.classList.add('siap')}catch(e){}
     $('m-group').setAttribute('aria-pressed',m==='group');
     $('m-solo').setAttribute('aria-pressed',m==='solo');
     $('kp-setup').hidden=m!=='group';
@@ -3520,7 +3531,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
         if(next>n){fb.textContent='Urutan benar. Bahas bersama: mengapa urutannya begitu?';fb.className='fb ok';sfx();award(key)}
       }else{
         b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
-        fb.textContent='Coba lagi: langkah apa yang datang lebih dulu?';fb.className='fb no';
+        fb.textContent='Coba lagi. Langkah mana yang dilakukan lebih dulu?';fb.className='fb no';
       }
     });
     box.querySelector('.seq-reset').onclick=box._reset;shuffle();
@@ -3551,7 +3562,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       if(focus)setTimeout(function(){try{part.focus({preventScroll:true})}catch(e){}},0);
       if(i>=data.steps.length){
         var e=document.createElement('p');e.className='lead';e.textContent=data.end;stage.appendChild(e);
-        var s=document.createElement('p');s.className='fb ok';s.textContent='Cerita selesai. Bahas bersama: apakah kejadian seperti ini pernah ada di kampung kita?';stage.appendChild(s);
+        var s=document.createElement('p');s.className='fb ok';/* Pertanyaan penutup tidak mengundang cerita yang mengenali orang; cerita sensitif membawa pertanyaannya sendiri (bahas). */
+        s.textContent='Cerita selesai. Bahas bersama: '+(typeof data.bahas==='string'&&data.bahas?data.bahas:'langkah mana yang paling sulit dilakukan di kampung kita, dan bagaimana mengatasinya? Tidak perlu menyebut nama orang.');stage.appendChild(s);
         award(key);
         var again=document.createElement('button');again.className='btn ghost';again.textContent='Ulangi cerita';again.onclick=function(){stopSpeak();render(0,true)};stage.appendChild(again);
         return;
@@ -3789,7 +3801,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     }
     function resText(R,x,k,lbl){
       if(!R||!R.fin)return lbl+': –';
-      if(R.mode==='group'){var t=tesCounts(R.ans[k]);return t?lbl+': '+Math.round(num(R.ans[k][x.a])/t*100)+'% tangan benar':lbl+': dilewati'}
+      if(R.mode==='group'){var t=tesCounts(R.ans[k]);return t?lbl+': '+Math.round(num(R.ans[k][x.a])/t*100)+'% jawaban benar':lbl+': dilewati'}
       return typeof R.ans[k]!=='number'?lbl+': –':R.ans[k]===x.a?lbl+': benar':lbl+': belum tepat';
     }
     function result(r){
@@ -3797,8 +3809,8 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       if(!z)msg='Semua soal dilewati, jadi belum ada skor.';
       else if(!a)msg='Tes awal belum dikerjakan, jadi belum ada perbandingan. Lain kali kerjakan "Tebak dulu!" di awal modul.';
       else if(a.mode!==z.mode)msg='Tes awal dan tes akhir memakai cara berbeda (belajar sendiri dan sesi kelompok), jadi hasilnya tidak dibandingkan.';
-      else if(z.pct>a.pct)msg=z.mode==='solo'&&a.mode==='solo'?'Jawaban benar naik dari '+a.b+' jadi '+z.b+' dari '+z.n+' soal.':'Tangan pada jawaban benar naik dari '+a.pct+'% jadi '+z.pct+'%.';
-      else if(z.pct===100)msg='Sempurna sejak awal. Hebat!';
+      else if(z.pct>a.pct)msg=z.mode==='solo'&&a.mode==='solo'?'Jawaban benar naik dari '+a.b+' jadi '+z.b+' dari '+z.n+' soal.':'Jawaban benar naik dari '+a.pct+'% jadi '+z.pct+'%.';
+      else if(z.pct===100)msg='Semua jawaban benar, di tes awal maupun tes akhir.';
       else if(z.pct===a.pct)msg='Sama seperti di awal. Yuk bahas lagi soal yang belum tepat di bawah ini.';
       else msg='Tidak apa-apa. Bahas lagi bersama soal yang belum tepat di bawah ini.';
       stage.appendChild(mk('p','eyebrow','Hasil'));
@@ -3807,7 +3819,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       [['Sebelum belajar',a,''],['Sesudah belajar',z,' post']].forEach(function(p){
         var bw=mk('div','tes-bar'+p[2]),lb=mk('div','lbl'),tr=mk('div','trk'),f=mk('i');
         lb.appendChild(mk('span',null,p[0]));
-        lb.appendChild(mk('span',null,!p[1]?'belum ada':p[1].mode==='group'?p[1].pct+'% tangan benar':p[1].b+' dari '+p[1].n+' benar'));
+        lb.appendChild(mk('span',null,!p[1]?'belum ada':p[1].mode==='group'?p[1].pct+'% jawaban benar':p[1].b+' dari '+p[1].n+' benar'));
         tr.appendChild(f);bw.appendChild(lb);bw.appendChild(tr);bars.appendChild(bw);fills.push([f,p[1]?p[1].pct:0]);
       });
       stage.appendChild(bars);
@@ -3819,9 +3831,15 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
           tz=per(T.post),ta=a&&a.mode==='group'?per(T.pre):null,
           ganjil=function(p){return p.some(function(x){return x!==p[0]||!x})},
           beda=ganjil(tz)||(ta&&(ganjil(ta)||ta[0]!==tz[0]));
-        stage.appendChild(mk('p','tes-sum','Persen dihitung dari jumlah tangan yang tercatat, bukan nilai per orang. Tangan per soal'+(ta?', tes awal: '+ta.join(', ')+'; tes akhir: ':': ')+tz.join(', ')+'.'+(beda?' Jumlahnya tidak sama di setiap soal, atau ada soal yang dilewati, jadi perbandingan ini hanya perkiraan.':'')));
+        stage.appendChild(mk('p','tes-sum','Persen dihitung dari semua jawaban yang dicatat, bukan nilai tiap orang. Jumlah tangan per soal'+(ta?', tes awal: '+ta.join(', ')+'; tes akhir: ':': ')+tz.join(', ')+'.'+(beda?' Jumlahnya berbeda-beda, jadi ini hanya perkiraan.':'')));
       }
-      if(z)stage.appendChild(mk('p','muted','Ini latihan dengan soal yang sama seperti tes awal, bukan ujian kemampuan. '+(z.mode==='group'?'Minta satu atau dua peserta menceritakan dengan kata sendiri apa yang akan dilakukan bila kejadian ini terjadi malam hari tanpa sinyal.':'Coba ceritakan dengan kata sendiri apa yang akan kamu lakukan bila kejadian ini terjadi malam hari tanpa sinyal.')));
+      /* Ajakan menceritakan kembali, sesuai topik modul (bukan satu templat untuk semua). */
+      var AJAR={bls:'bila ada orang dewasa tiba-tiba jatuh dan tidak sadar di kebun, malam hari, tanpa sinyal, langkah apa saja yang dilakukan?',
+        kespro:'tanda bahaya kehamilan apa saja yang membuat keluarga harus berangkat sekarang, dan siapa yang dihubungi lebih dulu?',
+        kulit:'bagaimana mengajak tetangga yang punya bercak mati rasa untuk periksa, tanpa membuatnya malu?',
+        gizi:'dari materi tadi, apa yang ingin dilakukan saat menyiapkan makanan atau merawat gigi anak?',
+        remaja:'ke mana remaja bisa mencari bantuan, dan apa yang bisa dilakukan untuk teman yang bercerita? Tidak perlu menceritakan pengalaman pribadi.'};
+      if(z)stage.appendChild(mk('p','muted','Ini latihan dengan soal yang sama seperti tes awal, bukan ujian kemampuan. '+(z.mode==='group'?'Minta satu atau dua peserta menjawab dengan kata sendiri: ':'Coba jawab dengan kata sendiri: ')+(AJAR[m]||'apa yang akan dilakukan setelah belajar materi ini?')));
       if(cheer){cheer=false;celebrate()}
       stage.appendChild(mk('h3',null,'Kunci jawaban dan penjelasan'));
       var A=T.pre&&T.pre.fin?T.pre:null,ul=mk('ol','tes-key'),say=[{t:msg}];
@@ -4044,7 +4062,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
         if(left>0){$('nt-time').textContent=left;return}
         stopNt();beep(660,.4);try{if(navigator.vibrate)navigator.vibrate(400)}catch(e){}
         $('nt-time').textContent='Selesai';
-        if(ntTaps>0){$('nt-count').value=ntTaps;$('nt-check').click();$('nt-fb').textContent='Dari ketukan 60 detik: '+$('nt-fb').textContent}else $('nt-count').focus();
+        if(ntTaps>0){$('nt-count').value=ntTaps;$('nt-check').click();$('nt-fb').textContent='Dihitung dari ketukan selama 60 detik. '+$('nt-fb').textContent}else $('nt-count').focus();
       },250);
       ntLast=0;wakeOn();
     };
@@ -4134,10 +4152,10 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function setStatus(id,ok,text){var el=$(id);el.className=ok===null?'':ok?'ok':'no';el.lastChild.textContent=text}
   function checkApp(){
     var sw=null,cs=null;try{sw=navigator.serviceWorker&&navigator.serviceWorker.controller;cs=window.caches}catch(e){}
-    if(!sw||!cs){setStatus('st-app',false,'Belum tersimpan untuk tanpa sinyal. Buka dari alamat resmi aplikasi saat ada sinyal, lalu tunggu tanda hijau.');return}
+    if(!sw||!cs){setStatus('st-app',false,'Aplikasi belum siap dipakai tanpa sinyal. Buka dari alamat resmi saat ada sinyal, lalu tunggu tanda hijau.');return}
     cs.match(location.href.split('#')[0].split('?')[0]).then(function(r){return r||cs.match('index.html')}).then(function(r){
       if(!r){setStatus('st-app',false,'Sedang menyimpan… biarkan terbuka sebentar saat ada sinyal.');setTimeout(checkApp,4000);return}
-      var done=function(p){setStatus('st-app',true,'Teks siap dipakai tanpa sinyal'+(p?', tersimpan tetap.':'. Jangan pakai aplikasi pembersih HP.'))};
+      var done=function(p){setStatus('st-app',true,'Teks siap dipakai tanpa sinyal'+(p?' dan tidak akan dihapus otomatis oleh HP.':'. Jangan pakai aplikasi pembersih HP.'))};
       try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(done,function(){done(false)});else done(false)}catch(e){done(false)}
       checkImgs();
     }).catch(function(){setStatus('st-app',false,'Tidak bisa memeriksa penyimpanan.')});
@@ -4196,11 +4214,11 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function recCount(set){var L=recList(set);return audioKeys.filter(function(k){return L.indexOf(k)>=0}).length}
   /* "Siap" hanya bila suaranya tersimpan di HP (localService); suara jaringan butuh sinyal. */
   function machineStatus(pre){
-    if(!canSpeak)return [false,pre+'HP ini tidak punya suara mesin. Bacakan langsung.'];
+    if(!canSpeak)return [false,pre+'Fitur Bacakan tidak tersedia di HP ini. Kalau perlu, minta pendamping membacakan teksnya.'];
     var v=idVoice();
-    if(v&&v.localService!==false)return pre?[false,pre+'Sementara memakai suara mesin bahasa Indonesia.']:[true,'Suara mesin bahasa Indonesia siap, tersimpan di HP.'];
-    if(v)return [false,pre+'Suara mesin bahasa Indonesia ada, tetapi butuh sinyal (suara jaringan). Pasang suara lokal lewat Setelan HP › Teks-ke-ucapan, atau pakai rekaman.'];
-    if(voicesKnown())return [false,pre+'Suara mesin belum siap: pasang suara bahasa Indonesia lewat Setelan HP › Bahasa › Teks-ke-ucapan.'];
+    if(v&&v.localService!==false)return pre?[false,pre+'Sementara memakai suara baca bawaan HP (bahasa Indonesia).']:[true,'Suara baca bawaan HP (bahasa Indonesia) siap dan tersimpan di HP.'];
+    if(v)return [false,pre+'Suara baca bawaan HP ada, tetapi masih butuh sinyal internet. Unduh suara bahasa Indonesia lewat Setelan HP › Output teks ke ucapan, atau pakai rekaman.'];
+    if(voicesKnown())return [false,pre+'Suara baca bawaan HP belum siap: pasang suara bahasa Indonesia lewat Setelan HP › Bahasa › Output teks ke ucapan.'];
     return [null,pre+'Suara belum bisa diperiksa. Coba tekan Bacakan sekali sebelum berangkat.'];
   }
   /* Rekaman dinilai dari yang benar-benar tersimpan di HP, bukan dari daftar. */
@@ -4221,7 +4239,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
       var head=papua&&nP?'Suara logat Papua: '+nP+' dari '+total+' layar direkam':papua?'Suara logat Papua belum direkam; memakai rekaman bahasa Indonesia':'Suara: rekaman bahasa Indonesia untuk '+nI+' dari '+total+' layar';
       var ok,msg;
       if(covered>=total){ok=true;msg='Semua layar punya rekaman tersimpan; siap tanpa sinyal.'}
-      else if(ttsLocal){ok=true;msg='Rekaman tersimpan untuk '+covered+' dari '+total+' layar; layar lain memakai suara mesin yang tersimpan di HP.'}
+      else if(ttsLocal){ok=true;msg='Rekaman tersimpan untuk '+covered+' dari '+total+' layar; layar lain memakai suara baca bawaan HP.'}
       else if(saved<urls.length){ok=false;msg='Tersimpan '+saved+' dari '+urls.length+' berkas; tekan "Simpan semua rekaman" saat ada sinyal.'}
       else{ok=null;msg='Rekaman tersimpan untuk '+covered+' dari '+total+' layar; layar lain TIDAK bersuara tanpa sinyal. '+mv[1]}
       setStatus('st-voice',ok,head+'. '+msg);
@@ -4344,35 +4362,40 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
     var keys=function(v){var o={};if(v&&typeof v==='object')Object.keys(v).forEach(function(k){if(/^[a-z]+$/.test(k))o[k]=1});return o};
     var tri=function(a){return Array.isArray(a)&&a.length===3?a.map(num):null},tes={};
     if(s.tes&&typeof s.tes==='object')Object.keys(s.tes).forEach(function(m){if(/^[a-z]+$/.test(m)&&Array.isArray(s.tes[m]))tes[m]=s.tes[m].filter(function(r){return r&&typeof r==='object'}).slice(0,20).map(function(r){return {m:r.m==='group'?'group':'solo',pre:tri(r.pre),post:tri(r.post)}})});
-    return {d:s.d.slice(0,10),kp:typeof s.kp==='string'?s.kp.slice(0,60):'',mode:s.mode==='group'||s.mode==='solo'?s.mode:'',mods:keys(s.mods),fin:keys(s.fin),say:num(s.say),act:num(s.act),off:s.off?1:0,tes:tes};
+    var o={d:s.d.slice(0,10),kp:typeof s.kp==='string'?s.kp.slice(0,60):'',mode:s.mode==='group'||s.mode==='solo'?s.mode:'',mods:keys(s.mods),fin:keys(s.fin),say:num(s.say),act:num(s.act),off:s.off?1:0,tes:tes};
+    /* Versi aplikasi hanya ikut bila ada, supaya sesi lama (tanpa versi) tetap sama persis dengan salinannya dan tidak tergandakan saat digabung. */
+    if(typeof s.v==='string'&&s.v)o.v=s.v.slice(0,12);
+    return o;
   }
+  /* Isi tautan pindah/cadangan (#bawa=): pengaturan, posisi, nomor jaga, dan catatan sesi; tanpa jawaban tes per soal. */
+  function bawaan(){var o={};['fs','theme','voice','auto','sfx','hinted','mode','pos','last','nomor','log','sess'].forEach(function(k){if(k in st)o[k]=st[k]});return b64e(JSON.stringify(o))}
   function terimaBawaan(){
     var m=/^#bawa=([A-Za-z0-9_-]+)$/.exec(location.hash||'');if(!m)return;
     try{history.replaceState(null,'',location.pathname+'#beranda')}catch(e){}
     var src=null;try{src=JSON.parse(b64d(m[1]))}catch(e){}
-    if(!src||typeof src!=='object'){toast('Data dari alamat lama tidak terbaca. Coba lagi tombol Pindah di alamat lama.');return}
+    if(!src||typeof src!=='object'){toast('Data di tautan ini tidak terbaca. Salin ulang tautannya dari HP asal.');return}
     var log=(Array.isArray(src.log)?src.log:[]).map(cleanSess).filter(Boolean),ss=cleanSess(src.sess);
     if(ss&&used(ss))log.push(ss);
     var nomor=typeof src.nomor==='string'?src.nomor.slice(0,30):'';
-    if(!confirm('Bawa catatan dari alamat lama ke HP ini? '+log.length+' sesi'+(nomor?' dan nomor jaga':'')+'. Catatan yang sudah ada di sini tidak dihapus.'))return;
+    if(!confirm('Pulihkan catatan dari tautan ini ke HP ini? '+log.length+' sesi'+(nomor?' dan nomor jaga':'')+'. Catatan yang sudah ada di sini tidak dihapus.'))return;
     var cur0=load(),fresh=!(Array.isArray(cur0.log)&&cur0.log.length)&&!used(cleanSess(cur0.sess)),out=fresh?{}:cur0,seen={};
     /* HP yang belum dipakai di alamat baru ikut membawa pengaturan dan posisi Lanjutkan; bintang mulai dari nol karena sesi lama diarsipkan. */
     if(fresh){['fs','theme','voice','auto','sfx','hinted','mode','pos','last'].forEach(function(k){if(k in src)out[k]=src[k]})}
     out.log=[].concat(Array.isArray(cur0.log)?cur0.log:[],log).filter(function(x){var k=JSON.stringify(x);if(seen[k])return false;seen[k]=1;return true}).slice(-100);
     if(!out.nomor&&nomor)out.nomor=nomor;
-    try{localStorage.setItem(KEY,JSON.stringify(out));toast(log.length+' sesi dari alamat lama sudah dipindahkan.')}catch(e){toast('Penyimpanan HP penuh atau diblokir; catatan belum bisa dipindahkan.')}
+    try{localStorage.setItem(KEY,JSON.stringify(out));toast(log.length+' sesi sudah dipulihkan.')}catch(e){toast('Penyimpanan HP penuh atau diblokir; catatan belum bisa dipindahkan.')}
   }
   try{ /* batas galat: pindah */
   if(LAMA.indexOf(location.hostname)>=0){
     $('pindah').hidden=false;$('pindah-url').textContent=ALAMAT.replace(/^https:[/][/]/,'').replace(/[/]$/,'');
     /* Hanya yang diterima alamat baru (lihat terimaBawaan): pengaturan, posisi, nomor jaga, dan catatan sesi; tanpa jawaban tes per soal. */
-    $('pindah-go').onclick=function(){var o={};['fs','theme','voice','auto','sfx','hinted','mode','pos','last','nomor','log','sess'].forEach(function(k){if(k in st)o[k]=st[k]});location.href=ALAMAT+'#bawa='+b64e(JSON.stringify(o))};
+    $('pindah-go').onclick=function(){location.href=ALAMAT+'#bawa='+bawaan()};
   }
   }catch(e){fault('pindah',e)}
 
   /* Pembuka logo setiap kali aplikasi dibuka atau dimuat ulang di beranda (1,85 detik), dan setiap kembali dari modul ke beranda
-     (ulang: 1,3 detik). Tidak muncul untuk tautan langsung (#darurat, QR modul, layar tertentu) supaya pertolongan tidak tertunda;
-     ketuk atau tombol apa pun menutupnya. */
+     (ulang: 1,3 detik, ketukan tembus ke beranda supaya tombol Darurat langsung bekerja). Tidak muncul untuk tautan langsung
+     (#darurat, QR modul, layar tertentu) supaya pertolongan tidak tertunda; ketuk atau tombol apa pun menutupnya. */
   var spT=0;
   function pembuka(ulang){
     var sp=$('splash');if(!sp)return;
@@ -4414,7 +4437,7 @@ fetch(dir+'manifest.webmanifest?cek='+new Date().getTime(),{cache:'no-store'})
   function renderErr(){var a=errList(),p=$('st-err'),r=$('err-row');if(!p)return;p.hidden=!a.length;r.hidden=!a.length;
     p.textContent=a.length?'Tercatat '+a.length+' masalah teknis (terakhir '+String(a[a.length-1].t||'').slice(0,16).replace('T',' ')+'). Bila aplikasi terasa aneh: Pengaturan › Perbaiki aplikasi.':''}
   try{
-  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.9'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
+  $('err-copy').onclick=function(){var t='Laporan masalah Literasi Kader v'+'0.9.10'+'\n'+errList().map(function(x){return x.t+' '+x.v+' '+x.m}).join('\n');
     try{navigator.clipboard.writeText(t).then(function(){toast('Laporan disalin')},function(){toast('Gagal menyalin')})}catch(e){toast('Gagal menyalin')}};
   $('err-clear').onclick=function(){try{localStorage.removeItem('literasi-galat')}catch(e){}renderErr();toast('Laporan dihapus')};
   }catch(e){fault('laporan',e)}
